@@ -127,7 +127,7 @@
 
     .flow-step {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 12px;
       background: #09090b;
       border: 1px solid #27272a;
@@ -138,17 +138,17 @@
     .flow-icon {
       color: #fafafa;
       flex-shrink: 0;
+      margin-top: 2px;
     }
 
     .flow-content {
       font-size: 13px;
       color: #a1a1aa;
-      line-height: 1.4;
+      line-height: 1.5;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 8px;
-      flex-wrap: nowrap;
-      white-space: nowrap;
+      gap: 6px;
       width: 100%;
     }
     .flow-content strong {
@@ -161,6 +161,21 @@
       color: #fafafa;
       font-style: normal;
       font-weight: 600;
+    }
+
+    @media (max-width: 480px) {
+      .app-card {
+        padding: 24px 20px;
+        border-radius: 14px;
+      }
+      .app-header {
+        align-items: flex-start;
+      }
+      .flow-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
     }
 
     /* CTA Section */
