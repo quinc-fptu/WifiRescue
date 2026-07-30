@@ -2,12 +2,16 @@ import os
 import sys
 import json
 import subprocess
+import threading
+import urllib.request
+import webbrowser
 import tkinter as tk
 from tkinter import messagebox
 from pathlib import Path
 
 __author__ = "QuiNC"
 __version__ = "1.2.0"
+GITHUB_REPO = "quinc-fptu/WifiRescue"
 
 # Application directory configuration
 if getattr(sys, 'frozen', False):
@@ -64,6 +68,86 @@ class ImpeccableDialog(tk.Toplevel):
         y = parent_y + (parent_h - height) // 2
         self.geometry(f"{width}x{height}+{max(0, x)}+{max(0, y)}")
         self.grab_set()
+
+class UpdatePromptDialog(ImpeccableDialog):
+    """Zinc-styled Remote Update Prompt Modal."""
+    def __init__(self, parent, latest_ver, download_url, release_notes="", app_icon_path=None):
+        super().__init__(parent, "Cập Nhật Phiên Bản Mới", app_icon_path)
+        self.download_url = download_url
+
+        # Header
+        head = tk.Frame(self, bg=self.BG, padx=18, pady=12)
+        head.pack(fill="x")
+
+        tk.Label(head, text=f"🎉 Đã Có Phiên Bản Mới ({latest_ver})", font=("Segoe UI", 10, "bold"), fg="#10B981", bg=self.BG).pack(anchor="w")
+        tk.Label(head, text=f"Bạn đang dùng v{__version__}. Khuyên dùng bản mới nhất!", font=("Segoe UI", 8), fg=self.MUTED, bg=self.BG).pack(anchor="w", pady=(2, 0))
+
+        tk.Frame(self, bg=self.BORDER, height=1).pack(fill="x", padx=18)
+
+        # Body Message
+        body = tk.Frame(self, bg=self.BG, padx=18, pady=10)
+        body.pack(fill="both", expand=True)
+
+        msg_text = f"Phiên bản WifiRescue {latest_ver} đã có sẵn trên GitHub.\n"
+        if release_notes:
+            msg_text += f"\nNội dung cập nhật:\n{release_notes[:150]}"
+
+        msg_lbl = tk.Label(
+            body,
+            text=msg_text,
+            font=("Segoe UI", 8),
+            fg="#D4D4D8",
+            bg=self.BG,
+            justify="left",
+            wraplength=310,
+            anchor="nw"
+        )
+        msg_lbl.pack(fill="both", expand=True)
+
+        # Bottom Buttons
+        btn_box = tk.Frame(self, bg=self.BG, padx=18, pady=10)
+        btn_box.pack(fill="x", side="bottom")
+
+        btn_download = tk.Button(
+            btn_box,
+            text="TẢI BẢN MỚI",
+            font=("Segoe UI", 8, "bold"),
+            bg="#10B981",
+            fg="#09090B",
+            activebackground="#34D399",
+            activeforeground="#09090B",
+            relief="flat",
+            bd=0,
+            cursor="hand2",
+            padx=12,
+            pady=5,
+            command=self.on_download
+        )
+        btn_download.pack(side="right", padx=(6, 0))
+
+        btn_later = tk.Button(
+            btn_box,
+            text="Để Sau",
+            font=("Segoe UI", 8),
+            bg=self.SURFACE,
+            fg=self.MUTED,
+            activebackground=self.BORDER,
+            activeforeground=self.INK,
+            relief="flat",
+            bd=0,
+            cursor="hand2",
+            padx=12,
+            pady=5,
+            command=self.destroy
+        )
+        btn_later.pack(side="right")
+
+        self.center_modal(360, 260)
+
+    def on_download(self):
+        if self.download_url:
+            webbrowser.open(self.download_url)
+        self.destroy()
 
 class EnterpriseCredentialDialog(ImpeccableDialog):
     """Custom dialog for entering Enterprise Wi-Fi credentials with Show/Hide password toggle."""
@@ -321,6 +405,36 @@ class CompactWifiApp:
         self.FONT_SIG = ("Segoe UI", 7, "italic")
 
         self.setup_ui()
+
+        # Check for remote updates in background thread
+        threading.Thread(target=self.check_update_async, daemon=True).start()
+
+    def check_update_async(self):
+        """Fetch latest release tag from GitHub API in background."""
+        try:
+            url = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+            req = urllib.request.Request(url, headers={"User-Agent": "WifiRescue-App"})
+            with urllib.request.urlopen(req, timeout=4) as response:
+                if response.status == 200:
+                    data = json.loads(response.read().decode("utf-8"))
+                    latest_tag = data.get("tag_name", "").lstrip("v")
+                    html_url = data.get("html_url", f"https://github.com/{GITHUB_REPO}/releases")
+                    notes = data.get("body", "")
+
+                    if latest_tag and self.is_newer_version(latest_tag, __version__):
+                        self.root.after(0, lambda: UpdatePromptDialog(self.root, f"v{latest_tag}", html_url, notes, self.icon_path))
+        except Exception:
+            pass
+
+    @staticmethod
+    def is_newer_version(latest, current):
+        """Parse version strings like 1.2.0 and compare tuple (1, 2, 0)."""
+        try:
+            p_latest = tuple(map(int, latest.split(".")))
+            p_current = tuple(map(int, current.split(".")))
+            return p_latest > p_current
+        except Exception:
+            return False
 
     def setup_ui(self):
         # Header Section
