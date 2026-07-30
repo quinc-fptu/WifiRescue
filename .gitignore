@@ -7,8 +7,12 @@ __pycache__/
 # Local backup directory (Contains private Wi-Fi profiles & passwords)
 WiFi_Backup/
 
+# Agent local memory & documentation
+.agents/
+
 # Local / IDE files
 .vscode/
 SyncBackground/
 ~$*
+
 
