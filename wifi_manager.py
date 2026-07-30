@@ -226,6 +226,70 @@ class CustomToast(ImpeccableDialog):
 
         self.center_modal(320, 180)
 
+class ChangelogDialog(ImpeccableDialog):
+    """Zinc-styled Changelog Modal."""
+    def __init__(self, parent, app_icon_path=None):
+        super().__init__(parent, "Changelog - WifiRescue", app_icon_path)
+
+        # Header
+        head = tk.Frame(self, bg=self.BG, padx=18, pady=12)
+        head.pack(fill="x")
+
+        tk.Label(head, text="🚀 NHẬT KÝ THAY ĐỔI (CHANGELOG)", font=("Segoe UI", 10, "bold"), fg=self.INK, bg=self.BG).pack(anchor="w")
+        tk.Label(head, text=f"WifiRescue by QuiNC · Hiện tại: v{__version__}", font=("Segoe UI", 8), fg=self.MUTED, bg=self.BG).pack(anchor="w", pady=(2, 0))
+
+        tk.Frame(self, bg=self.BORDER, height=1).pack(fill="x", padx=18)
+
+        # Content
+        body = tk.Frame(self, bg=self.BG, padx=18, pady=10)
+        body.pack(fill="both", expand=True)
+
+        changelog_text = (
+            "✨ v1.2.0 (Phiên bản mới nhất):\n"
+            "• Giao diện Modal & Toast Impeccable Zinc Dark Mode.\n"
+            "• Thêm nút 👁 hiện/ẩn mật khẩu khi nhập tài khoản.\n"
+            "• Khử trùng lặp Popup khi có nhiều Wi-Fi Enterprise.\n"
+            "• Căn giữa màn hình (Center Modal) & Sửa lỗi Font.\n\n"
+            "⚡ v1.1.0:\n"
+            "• Hỗ trợ tự động sao lưu & khôi phục tài khoản\n"
+            "  Wi-Fi Trường FU-Students (WPA2 802.1X Enterprise).\n"
+            "• Tích hợp lệnh cmdkey vào Windows Credential Manager.\n\n"
+            "🎉 v1.0.0:\n"
+            "• Phát hành chính thức ứng dụng Portable WifiRescue."
+        )
+
+        txt = tk.Label(
+            body,
+            text=changelog_text,
+            font=("Segoe UI", 8),
+            fg="#D4D4D8",
+            bg=self.BG,
+            justify="left",
+            anchor="nw"
+        )
+        txt.pack(fill="both", expand=True)
+
+        btn_box = tk.Frame(self, bg=self.BG, padx=18, pady=10)
+        btn_box.pack(fill="x", side="bottom")
+
+        btn_close = tk.Button(
+            btn_box,
+            text="Đóng",
+            font=("Segoe UI", 8, "bold"),
+            bg=self.SURFACE,
+            fg=self.INK,
+            activebackground=self.BORDER,
+            activeforeground=self.INK,
+            relief="flat",
+            bd=0,
+            cursor="hand2",
+            pady=5,
+            command=self.destroy
+        )
+        btn_close.pack(fill="x")
+
+        self.center_modal(360, 320)
+
 class CompactWifiApp:
     def __init__(self, root):
         self.root = root
@@ -276,6 +340,17 @@ class CompactWifiApp:
         right_links = tk.Frame(header, bg=self.COLOR_BG)
         right_links.pack(side="right")
 
+        btn_ver = tk.Label(
+            right_links,
+            text=f"v{__version__}",
+            font=self.FONT_SMALL,
+            fg="#10B981",
+            bg=self.COLOR_BG,
+            cursor="hand2"
+        )
+        btn_ver.pack(side="left", padx=(0, 8))
+        btn_ver.bind("<Button-1>", lambda e: self.show_changelog_popup())
+
         btn_help = tk.Label(
             right_links,
             text="❓ Help",
@@ -284,7 +359,7 @@ class CompactWifiApp:
             bg=self.COLOR_BG,
             cursor="hand2"
         )
-        btn_help.pack(side="left", padx=(0, 10))
+        btn_help.pack(side="left", padx=(0, 8))
         btn_help.bind("<Button-1>", lambda e: self.show_help_popup())
 
         btn_folder = tk.Label(
@@ -360,13 +435,22 @@ class CompactWifiApp:
         )
         lbl_sig.pack(side="right")
 
+    def show_changelog_popup(self):
+        ChangelogDialog(self.root, self.icon_path)
+
     def show_help_popup(self):
         popup = ImpeccableDialog(self.root, "Hướng Dẫn Sử Dụng - WifiRescue", self.icon_path)
-        popup.geometry("380x340")
 
-        popup.add_header("📖 HƯỚNG DẪN SỬ DỤNG", "Tác giả: QuiNC · Phiên bản Portable")
+        # Header
+        head = tk.Frame(popup, bg=popup.BG, padx=18, pady=12)
+        head.pack(fill="x")
+        
+        tk.Label(head, text="📖 HƯỚNG DẪN SỬ DỤNG", font=("Segoe UI", 10, "bold"), fg=popup.INK, bg=popup.BG).pack(anchor="w")
+        tk.Label(head, text="Tác giả: QuiNC · Phiên bản Portable", font=("Segoe UI", 8), fg=popup.MUTED, bg=popup.BG).pack(anchor="w", pady=(2, 0))
 
-        body_f = tk.Frame(popup, bg=self.COLOR_BG, padx=20, pady=14)
+        tk.Frame(popup, bg=popup.BORDER, height=1).pack(fill="x", padx=18)
+
+        body_f = tk.Frame(popup, bg=popup.BG, padx=18, pady=12)
         body_f.pack(fill="both", expand=True)
 
         steps_text = (
@@ -386,27 +470,32 @@ class CompactWifiApp:
             text=steps_text,
             font=("Segoe UI", 8),
             fg="#D4D4D8",
-            bg=self.COLOR_BG,
+            bg=popup.BG,
             justify="left",
             anchor="nw"
         )
         txt.pack(fill="both", expand=True)
 
+        btn_box = tk.Frame(popup, bg=popup.BG, padx=18, pady=10)
+        btn_box.pack(fill="x", side="bottom")
+
         btn_close = tk.Button(
-            popup,
-            text="ĐÃ HIỂU",
-            font=self.FONT_BTN,
-            bg=self.COLOR_SURFACE,
-            fg=self.COLOR_INK,
-            activebackground=self.COLOR_BORDER,
-            activeforeground=self.COLOR_INK,
+            btn_box,
+            text="Đã Hiểu",
+            font=("Segoe UI", 8, "bold"),
+            bg=popup.SURFACE,
+            fg=popup.INK,
+            activebackground=popup.BORDER,
+            activeforeground=popup.INK,
             relief="flat",
             bd=0,
             cursor="hand2",
-            pady=6,
+            pady=5,
             command=popup.destroy
         )
-        btn_close.pack(fill="x", padx=20, pady=(0, 16))
+        btn_close.pack(fill="x")
+
+        popup.center_modal(360, 310)
 
     def backup_wifi(self):
         try:

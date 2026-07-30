@@ -34,6 +34,23 @@ Tác giả: **QuiNC** · Phiên bản: **v1.2.0**
 
 ---
 
+## 📜 Nhật Ký Thay Đổi (Changelog)
+
+### 🚀 v1.2.0 (Phát hành mới nhất)
+- **Impeccable Zinc Dark Theme:** Toàn bộ Popup Dialogs và Toast Notification được thiết kế lại theo tiêu chuẩn Zinc Dark Mode.
+- **Password Eye Toggle (👁):** Tích hợp nút bật/tắt hiển thị mật khẩu khi nhập tài khoản Wi-Fi Enterprise.
+- **Deduplicated Enterprise Prompts:** Khử trùng lặp các SSID mạng trường (FU-Students, FU-Exams) để hiển thị 1 form nhập đại diện duy nhất.
+- **Center Modal & Auto Geometry:** Tự động căn giữa cửa sổ Modal và sửa lỗi font float trên Windows/Tkinter.
+- **Version & Changelog Viewer:** Bổ sung nút bấm hiển thị version `v1.2.0` trên Header để xem nhanh Changelog.
+
+### ⚡ v1.1.0
+- **Enterprise Wi-Fi Auto-Login:** Tự động lưu & nạp lại Username / Password cho Wi-Fi **FU-Students** (802.1X Enterprise) bằng Windows Credential Manager (`cmdkey`).
+
+### 🎉 v1.0.0
+- Phát hành phiên bản Portable đầu tiên hỗ trợ sao lưu & khôi phục 1-click Wi-Fi chuẩn phân quyền FPTU (`user=all`).
+
+---
+
 ## 🌐 Trang Web Hướng Dẫn
 👉 [https://quinc-fptu.github.io/WifiRescue/](https://quinc-fptu.github.io/WifiRescue/)
 
@@ -41,6 +58,7 @@ Tác giả: **QuiNC** · Phiên bản: **v1.2.0**
 
 ## 🛡️ Bản Quyền
 Copyright (c) 2026 QuiNC. All rights reserved.
+
 
 
 
