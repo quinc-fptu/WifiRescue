@@ -1,64 +1,109 @@
-# 📶 WifiRescue - Windows Wi-Fi Backup & Restore Tool
+<div align="center">
 
-**WifiRescue** là công cụ portable nhỏ gọn giúp sinh viên **FPTU** sao lưu và khôi phục toàn bộ mật khẩu Wi-Fi (bao gồm cả tài khoản Wi-Fi trường **FU-Students** / WPA2 Enterprise) trên Windows chỉ trong 1-click mỗi lần đi thi bị bắt "Forget Wi-Fi".
+<img src="favicon.svg" width="64" height="64" alt="WifiRescue Icon" />
 
-Tác giả: **QuiNC** · Phiên bản: **v1.2.0**
+# WifiRescue
 
----
+**Công cụ 1-click sao lưu & khôi phục Wi-Fi cho sinh viên FPTU.**  
+Không bao giờ phải cấu hình lại mạng sau mỗi buổi thi PE/FE nữa.
 
-## 🌟 Tính Năng Nổi Bật (v1.2.0)
+[![Release](https://img.shields.io/github/v/release/quinc-fptu/WifiRescue?style=flat-square&color=18181b&labelColor=09090b&label=Latest)](https://github.com/quinc-fptu/WifiRescue/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/quinc-fptu/WifiRescue/total?style=flat-square&color=18181b&labelColor=09090b)](https://github.com/quinc-fptu/WifiRescue/releases)
+[![Windows](https://img.shields.io/badge/Platform-Windows-blue?style=flat-square&color=18181b&labelColor=09090b)](https://github.com/quinc-fptu/WifiRescue)
+[![License](https://img.shields.io/badge/License-Proprietary-red?style=flat-square&color=18181b&labelColor=09090b)](https://github.com/quinc-fptu/WifiRescue)
 
-- **1-Click Backup & Restore:** Sao lưu và khôi phục Wi-Fi trong 1s với phân quyền chuẩn FPTU (`user=all`).
-- **Enterprise Auto-Login:** Tự động lưu & nạp lại Username / Password cho mạng trường **FU-Students** (802.1X Enterprise) qua Windows Credential Manager.
-- **Impeccable Zinc Dark Theme UI:** Giao diện Modal & Toast Notification thiết kế chuẩn Impeccable Zinc Dark Mode.
-- **Password Eye Toggle (👁):** Form nhập tài khoản thông minh cho phép bật/tắt hiển thị mật khẩu để kiểm tra chính xác trước khi lưu.
-- **Sequential Modal Windowing:** Tự động gộp các SSID Enterprise trùng lặp và hiển thị từng thông báo tuần tự, không bị đè cửa sổ.
-- **100% Single File Executable Portable:** Chạy trực tiếp file `WifiRescue.exe` không cần cài đặt.
+[**⬇ Tải ngay**](https://github.com/quinc-fptu/WifiRescue/releases/latest) · [**📄 Trang hướng dẫn**](https://quinc-fptu.github.io/WifiRescue/) · [**🐛 Báo lỗi**](https://github.com/quinc-fptu/WifiRescue/issues)
 
----
-
-## 💡 Lưu Ý Về Wi-Fi Trường (FU-Students / WPA2 Enterprise)
-
-- **Vì sao cần nhập tài khoản 1 lần khi Backup?**  
-  Khác với Wi-Fi cá nhân (WPA2-Personal) lưu mật khẩu rõ ràng trong file XML, Wi-Fi trường học (**FU-Students**) sử dụng mã hóa doanh nghiệp **802.1X (EAP-PEAP)**. Mật khẩu được Windows mã hóa 1 chiều bảo mật trong hệ thống (LSA Secrets) nên không thể trích xuất trực tiếp dạng văn bản thô.
-- **Giải pháp của WifiRescue:**  
-  Bạn chỉ cần nhập Username/Password **1 lần duy nhất** khi bấm Backup. Thông tin này sẽ được lưu an toàn trong file `enterprise_credentials.json` đi kèm. Khi sang máy mới hoặc sau khi thi xong, bấm **RESTORE PROFILES** thì tool sẽ tự động đăng nhập vào Windows Credential Manager mà **không bao giờ phải nhập lại nữa!**
+</div>
 
 ---
 
-## 📖 Hướng Dẫn Sử Dụng
+## Vấn đề
 
-1. **Tải về & Giải nén:** Tải `WifiRescue.zip` từ [Releases](https://github.com/quinc-fptu/WifiRescue/releases) và giải nén ra thư mục.
-2. **Trước khi thi (Backup):** Mở `WifiRescue.exe` ➔ Bấm **BACKUP PROFILES**. Nhập Username/Password Wi-Fi **FU-Students** 1 lần duy nhất để lưu lại.
-3. **Sau khi thi (Restore):** Mở `WifiRescue.exe` ➔ Bấm **RESTORE PROFILES**. Mọi Wi-Fi và tài khoản **FU-Students** sẽ tự động được nạp lại vào Windows mà không cần nhập thủ công!
+Mỗi lần thi PE/FE tại FPTU, máy tính bị bắt **Forget Wi-Fi** trước khi vào phòng thi. Sau khi thi xong, sinh viên phải kết nối lại thủ công từng mạng — đặc biệt với **FU-Students** (WPA2 Enterprise / 802.1X) đòi hỏi đăng nhập tài khoản và cấu hình lại rất mất thời gian.
+
+**WifiRescue** giải quyết hoàn toàn vấn đề này chỉ với 2 lần bấm nút.
 
 ---
 
-## 📜 Nhật Ký Thay Đổi (Changelog)
+## Tính năng
 
-### 🚀 v1.2.0 (Phát hành mới nhất)
-- **Impeccable Zinc Dark Theme:** Toàn bộ Popup Dialogs và Toast Notification được thiết kế lại theo tiêu chuẩn Zinc Dark Mode.
-- **Password Eye Toggle (👁):** Tích hợp nút bật/tắt hiển thị mật khẩu khi nhập tài khoản Wi-Fi Enterprise.
-- **Deduplicated Enterprise Prompts:** Khử trùng lặp các SSID mạng trường (FU-Students, FU-Exams) để hiển thị 1 form nhập đại diện duy nhất.
-- **Center Modal & Auto Geometry:** Tự động căn giữa cửa sổ Modal và sửa lỗi font float trên Windows/Tkinter.
-- **Version & Changelog Viewer:** Bổ sung nút bấm hiển thị version `v1.2.0` trên Header để xem nhanh Changelog.
+| Tính năng | Mô tả |
+|---|---|
+| **1-Click Backup** | Sao lưu toàn bộ Wi-Fi Profile với phân quyền FPTU (`user=all`) |
+| **1-Click Restore** | Khôi phục tất cả mạng và đăng nhập tự động vào Windows |
+| **Enterprise Auto-Login** | Tự lưu & nạp lại tài khoản **FU-Students** (802.1X) qua Credential Manager |
+| **Password Eye Toggle** | Xem/ẩn mật khẩu khi nhập để kiểm tra trước khi lưu |
+| **Auto Update Check** | Tự động kiểm tra phiên bản mới từ GitHub Releases khi khởi động |
+| **Portable .exe** | Chạy thẳng file, không cần cài đặt, không phụ thuộc Python |
+
+---
+
+## Cài đặt & Sử dụng
+
+### Bước 1 — Tải về
+
+Tải file `WifiRescue.zip` từ **[Releases](https://github.com/quinc-fptu/WifiRescue/releases/latest)** và giải nén ra thư mục bất kỳ.
+
+```
+WifiRescue/
+├── WifiRescue.exe        ← Chạy file này
+└── WiFi_Backup/          ← Tự tạo khi Backup lần đầu
+    ├── *.xml             (Profile Wi-Fi)
+    └── enterprise_credentials.json  (Tài khoản FU-Students — KHÔNG share)
+```
+
+### Bước 2 — Trước khi thi (Backup)
+
+1. Mở `WifiRescue.exe`
+2. Bấm **BACKUP PROFILES**
+3. Nhập Username / Password **FU-Students** khi được hỏi *(chỉ 1 lần duy nhất)*
+
+### Bước 3 — Sau khi thi (Restore)
+
+1. Mở `WifiRescue.exe`
+2. Bấm **RESTORE PROFILES**
+3. Tất cả Wi-Fi và tài khoản **FU-Students** tự động nạp lại — không cần nhập gì thêm!
+
+---
+
+## Lưu ý về FU-Students (802.1X Enterprise)
+
+Wi-Fi trường sử dụng chuẩn **EAP-PEAP (802.1X)** — mật khẩu được Windows mã hóa 1 chiều trong LSA Secrets, không thể trích xuất dạng văn bản thô như Wi-Fi cá nhân.
+
+> **Giải pháp:** WifiRescue yêu cầu bạn nhập tài khoản **1 lần duy nhất** khi Backup. Thông tin này được lưu cục bộ trong `WiFi_Backup/enterprise_credentials.json`. Mọi lần Restore sau đó, tool tự động đăng nhập vào Windows Credential Manager mà không cần nhập lại.
+
+⚠️ **Không chia sẻ** thư mục `WiFi_Backup/` cho người khác vì chứa mật khẩu cá nhân.
+
+---
+
+## Changelog
+
+### 🚀 v1.2.0 *(Latest)*
+- **Impeccable Zinc Dark Theme** — Toàn bộ Dialog & Toast Notification thiết kế lại theo tiêu chuẩn Zinc Dark Mode
+- **Password Eye Toggle (👁)** — Bật/tắt hiển thị mật khẩu trong form nhập tài khoản Enterprise
+- **Deduplicated Enterprise Prompts** — Khử trùng lặp SSID, hiển thị 1 form nhập đại diện duy nhất
+- **Auto-centered Modal & Geometry Fix** — Tự căn giữa cửa sổ, sửa lỗi font float trên Windows/Tkinter
+- **Version & Changelog Viewer** — Nút hiển thị version `v1.2.0` trên Header để xem Changelog nhanh
 
 ### ⚡ v1.1.0
-- **Enterprise Wi-Fi Auto-Login:** Tự động lưu & nạp lại Username / Password cho Wi-Fi **FU-Students** (802.1X Enterprise) bằng Windows Credential Manager (`cmdkey`).
+- **Enterprise Wi-Fi Auto-Login** — Tự động lưu & nạp lại tài khoản FU-Students (802.1X) qua `cmdkey`
 
 ### 🎉 v1.0.0
-- Phát hành phiên bản Portable đầu tiên hỗ trợ sao lưu & khôi phục 1-click Wi-Fi chuẩn phân quyền FPTU (`user=all`).
+- Phát hành phiên bản Portable đầu tiên, hỗ trợ Backup & Restore 1-click chuẩn FPTU
 
 ---
 
-## 🌐 Trang Web Hướng Dẫn
-👉 [https://quinc-fptu.github.io/WifiRescue/](https://quinc-fptu.github.io/WifiRescue/)
+## Bảo mật
+
+- File `enterprise_credentials.json` **không được commit** lên Git (đã thêm vào `.gitignore`)
+- Tool **không gửi dữ liệu** ra ngoài — tất cả xử lý cục bộ trên máy
+- Kiểm tra phiên bản chỉ gọi GitHub API công khai (`/releases/latest`), không truyền thông tin cá nhân
 
 ---
 
-## 🛡️ Bản Quyền
-Copyright (c) 2026 QuiNC. All rights reserved.
+<div align="center">
 
+Made with ❤️ for FPTU students by **[QuiNC](https://github.com/quinc-fptu)**
 
-
-
+</div>
