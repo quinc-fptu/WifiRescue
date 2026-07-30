@@ -1,12 +1,13 @@
 import os
 import sys
+import json
 import subprocess
 import tkinter as tk
 from tkinter import messagebox
 from pathlib import Path
 
 __author__ = "QuiNC"
-__version__ = "1.0.0"
+__version__ = "1.2.0"
 
 # Application directory configuration
 if getattr(sys, 'frozen', False):
@@ -17,13 +18,213 @@ else:
     BUNDLE_DIR = APP_DIR
 
 BACKUP_DIR = APP_DIR / "WiFi_Backup"
+CREDENTIALS_FILE = BACKUP_DIR / "enterprise_credentials.json"
 
 # Windows AppUserModelID for taskbar icon binding
 try:
     import ctypes
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("QuiNC.WifiRescue.App.1.0")
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("QuiNC.WifiRescue.App.1.2")
 except Exception:
     pass
+
+class ImpeccableDialog(tk.Toplevel):
+    """Custom Zinc-themed dialog modal matching the main app aesthetics."""
+    def __init__(self, parent, title, app_icon_path=None):
+        super().__init__(parent)
+        self.title(title)
+        self.resizable(False, False)
+        self.configure(bg="#09090B")
+        self.transient(parent)
+
+        if app_icon_path and app_icon_path.exists():
+            try:
+                self.iconbitmap(str(app_icon_path))
+            except Exception:
+                pass
+
+        # Color scheme
+        self.BG = "#09090B"
+        self.SURFACE = "#18181B"
+        self.BORDER = "#27272A"
+        self.INK = "#FAFAFA"
+        self.MUTED = "#A1A1AA"
+        self.ACCENT = "#3F3F46"
+
+    def center_modal(self, width=340, height=260):
+        """Center modal window over parent window."""
+        self.update_idletasks()
+        self.master.update_idletasks()
+
+        parent_x = self.master.winfo_rootx()
+        parent_y = self.master.winfo_rooty()
+        parent_w = self.master.winfo_width()
+        parent_h = self.master.winfo_height()
+
+        x = parent_x + (parent_w - width) // 2
+        y = parent_y + (parent_h - height) // 2
+        self.geometry(f"{width}x{height}+{max(0, x)}+{max(0, y)}")
+        self.grab_set()
+
+class EnterpriseCredentialDialog(ImpeccableDialog):
+    """Custom dialog for entering Enterprise Wi-Fi credentials with Show/Hide password toggle."""
+    def __init__(self, parent, ssid_name, app_icon_path=None, default_user=""):
+        super().__init__(parent, f"Wi-Fi Credentials - {ssid_name}", app_icon_path)
+        self.result = None
+
+        # Header
+        head = tk.Frame(self, bg=self.BG, padx=18, pady=12)
+        head.pack(fill="x")
+        
+        tk.Label(head, text=f"🔑 Wi-Fi Trường ({ssid_name})", font=("Segoe UI", 10, "bold"), fg=self.INK, bg=self.BG).pack(anchor="w")
+        tk.Label(head, text="Nhập tài khoản để tự động lưu & khôi phục khi đi thi.", font=("Segoe UI", 8), fg=self.MUTED, bg=self.BG).pack(anchor="w", pady=(2, 0))
+
+        tk.Frame(self, bg=self.BORDER, height=1).pack(fill="x", padx=18)
+
+        # Body Form
+        body = tk.Frame(self, bg=self.BG, padx=18, pady=10)
+        body.pack(fill="both", expand=True)
+
+        # Username Field
+        tk.Label(body, text="USERNAME / MSSV", font=("Segoe UI", 8, "bold"), fg="#71717A", bg=self.BG).pack(anchor="w")
+        
+        u_frame = tk.Frame(body, bg=self.SURFACE, highlightbackground=self.BORDER, highlightthickness=1)
+        u_frame.pack(fill="x", pady=(3, 8))
+        
+        self.ent_user = tk.Entry(u_frame, font=("Segoe UI", 9), bg=self.SURFACE, fg=self.INK, insertbackground=self.INK, bd=0, relief="flat")
+        self.ent_user.pack(fill="x", padx=8, pady=5)
+        if default_user:
+            self.ent_user.insert(0, default_user)
+        else:
+            self.ent_user.focus_set()
+
+        # Password Field
+        tk.Label(body, text="PASSWORD / MẬT KHẨU", font=("Segoe UI", 8, "bold"), fg="#71717A", bg=self.BG).pack(anchor="w")
+
+        p_frame = tk.Frame(body, bg=self.SURFACE, highlightbackground=self.BORDER, highlightthickness=1)
+        p_frame.pack(fill="x", pady=(3, 6))
+
+        self.ent_pass = tk.Entry(p_frame, font=("Segoe UI", 9), bg=self.SURFACE, fg=self.INK, insertbackground=self.INK, bd=0, relief="flat", show="•")
+        self.ent_pass.pack(side="left", fill="x", expand=True, padx=(8, 4), pady=5)
+
+        self.show_pwd = False
+        self.btn_toggle = tk.Label(p_frame, text="👁", font=("Segoe UI", 9), fg="#71717A", bg=self.SURFACE, cursor="hand2")
+        self.btn_toggle.pack(side="right", padx=6)
+        self.btn_toggle.bind("<Button-1>", self.toggle_password_visibility)
+
+        # Action Buttons
+        btn_box = tk.Frame(self, bg=self.BG, padx=18, pady=10)
+        btn_box.pack(fill="x", side="bottom")
+
+        btn_save = tk.Button(
+            btn_box,
+            text="Lưu Tài Khoản",
+            font=("Segoe UI", 8, "bold"),
+            bg=self.INK,
+            fg=self.BG,
+            activebackground="#E4E4E7",
+            activeforeground=self.BG,
+            relief="flat",
+            bd=0,
+            cursor="hand2",
+            padx=12,
+            pady=5,
+            command=self.on_save
+        )
+        btn_save.pack(side="right", padx=(6, 0))
+
+        btn_skip = tk.Button(
+            btn_box,
+            text="Bỏ Qua",
+            font=("Segoe UI", 8),
+            bg=self.SURFACE,
+            fg=self.MUTED,
+            activebackground=self.BORDER,
+            activeforeground=self.INK,
+            relief="flat",
+            bd=0,
+            cursor="hand2",
+            padx=12,
+            pady=5,
+            command=self.destroy
+        )
+        btn_skip.pack(side="right")
+
+        self.center_modal(340, 240)
+
+    def toggle_password_visibility(self, event=None):
+        self.show_pwd = not self.show_pwd
+        if self.show_pwd:
+            self.ent_pass.config(show="")
+            self.btn_toggle.config(fg=self.INK)
+        else:
+            self.ent_pass.config(show="•")
+            self.btn_toggle.config(fg="#71717A")
+
+    def on_save(self):
+        u = self.ent_user.get().strip()
+        p = self.ent_pass.get().strip()
+        if u and p:
+            self.result = (u, p)
+            self.destroy()
+
+class CustomToast(ImpeccableDialog):
+    """Zinc-styled Notification Toast Modal with auto-calculated height & perfect centering."""
+    def __init__(self, parent, title, message, is_error=False, app_icon_path=None):
+        super().__init__(parent, title, app_icon_path)
+
+        # Header
+        head = tk.Frame(self, bg=self.BG, padx=16, pady=10)
+        head.pack(fill="x")
+
+        icon_str = "❌ " if is_error else "✓ "
+        lbl = tk.Label(
+            head,
+            text=icon_str + title,
+            font=("Segoe UI", 10, "bold"),
+            fg="#EF4444" if is_error else "#10B981",
+            bg=self.BG
+        )
+        lbl.pack(anchor="w")
+
+        tk.Frame(self, bg=self.BORDER, height=1).pack(fill="x", padx=16)
+
+        # Body Message
+        body = tk.Frame(self, bg=self.BG, padx=16, pady=10)
+        body.pack(fill="both", expand=True)
+
+        msg_lbl = tk.Label(
+            body,
+            text=message,
+            font=("Segoe UI", 8),
+            fg="#D4D4D8",
+            bg=self.BG,
+            justify="left",
+            wraplength=280,
+            anchor="nw"
+        )
+        msg_lbl.pack(fill="both", expand=True)
+
+        # Bottom Button
+        btn_box = tk.Frame(self, bg=self.BG, padx=16, pady=10)
+        btn_box.pack(fill="x", side="bottom")
+
+        btn_close = tk.Button(
+            btn_box,
+            text="Đã Hiểu",
+            font=("Segoe UI", 8, "bold"),
+            bg=self.SURFACE,
+            fg=self.INK,
+            activebackground=self.BORDER,
+            activeforeground=self.INK,
+            relief="flat",
+            bd=0,
+            cursor="hand2",
+            pady=5,
+            command=self.destroy
+        )
+        btn_close.pack(fill="x")
+
+        self.center_modal(320, 180)
 
 class CompactWifiApp:
     def __init__(self, root):
@@ -32,10 +233,10 @@ class CompactWifiApp:
         self.root.geometry("340x260")
         self.root.resizable(False, False)
 
-        icon_path = BUNDLE_DIR / "app_icon_flat.ico"
-        if icon_path.exists():
+        self.icon_path = BUNDLE_DIR / "app_icon_flat.ico"
+        if self.icon_path.exists():
             try:
-                self.root.iconbitmap(str(icon_path))
+                self.root.iconbitmap(str(self.icon_path))
             except Exception:
                 pass
 
@@ -160,53 +361,22 @@ class CompactWifiApp:
         lbl_sig.pack(side="right")
 
     def show_help_popup(self):
-        popup = tk.Toplevel(self.root)
-        popup.title("Hướng Dẫn Sử Dụng - WifiRescue")
-        popup.geometry("380x320")
-        popup.resizable(False, False)
-        popup.configure(bg=self.COLOR_BG)
+        popup = ImpeccableDialog(self.root, "Hướng Dẫn Sử Dụng - WifiRescue", self.icon_path)
+        popup.geometry("380x340")
 
-        icon_path = BUNDLE_DIR / "app_icon_flat.ico"
-        if icon_path.exists():
-            try:
-                popup.iconbitmap(str(icon_path))
-            except Exception:
-                pass
-
-        popup.transient(self.root)
-        popup.grab_set()
-
-        head_f = tk.Frame(popup, bg=self.COLOR_BG, padx=20, pady=16)
-        head_f.pack(fill="x")
-
-        tk.Label(
-            head_f,
-            text="📖 HƯỚNG DẪN SỬ DỤNG",
-            font=("Segoe UI", 11, "bold"),
-            fg=self.COLOR_INK,
-            bg=self.COLOR_BG
-        ).pack(anchor="w")
-
-        tk.Label(
-            head_f,
-            text="Tác giả: QuiNC · Phiên bản Portable",
-            font=self.FONT_SMALL,
-            fg=self.COLOR_MUTED,
-            bg=self.COLOR_BG
-        ).pack(anchor="w", pady=(2, 0))
-
-        tk.Frame(popup, bg=self.COLOR_BORDER, height=1).pack(fill="x", padx=20)
+        popup.add_header("📖 HƯỚNG DẪN SỬ DỤNG", "Tác giả: QuiNC · Phiên bản Portable")
 
         body_f = tk.Frame(popup, bg=self.COLOR_BG, padx=20, pady=14)
         body_f.pack(fill="both", expand=True)
 
         steps_text = (
             "1. Trước khi đi thi (Sao lưu):\n"
-            "   Mở app ➔ Bấm BACKUP PROFILES để lưu toàn bộ Wi-Fi\n"
-            "   vào thư mục WiFi_Backup (nằm cùng cấp với app).\n\n"
+            "   Mở app ➔ Bấm BACKUP PROFILES để lưu toàn bộ Wi-Fi.\n"
+            "   Nếu có Wi-Fi Trường (FU-Students), app sẽ hiển thị\n"
+            "   popup nhập Username & Password chung để sao lưu.\n\n"
             "2. Sau khi thi xong (Khôi phục):\n"
-            "   Mở app ➔ Bấm RESTORE PROFILES để nạp lại tất cả\n"
-            "   mật khẩu Wi-Fi chỉ trong 1 giây.\n\n"
+            "   Mở app ➔ Bấm RESTORE PROFILES để nạp lại Wi-Fi\n"
+            "   và tự động đăng nhập FU-Students không cần gõ lại!\n\n"
             "💡 Lưu ý: Nếu Windows báo màn hình xanh lần đầu,\n"
             "   chọn More info ➔ chọn Run anyway để chạy."
         )
@@ -224,7 +394,7 @@ class CompactWifiApp:
 
         btn_close = tk.Button(
             popup,
-            text="Đã Hiểu",
+            text="ĐÃ HIỂU",
             font=self.FONT_BTN,
             bg=self.COLOR_SURFACE,
             fg=self.COLOR_INK,
@@ -246,22 +416,60 @@ class CompactWifiApp:
 
             if result.returncode == 0:
                 count = len(list(BACKUP_DIR.glob("*.xml")))
+                
+                # Check for Enterprise SSIDs (like FU-Students, FU-Exams)
+                ent_creds = {}
+                if CREDENTIALS_FILE.exists():
+                    try:
+                        ent_creds = json.loads(CREDENTIALS_FILE.read_text(encoding="utf-8"))
+                    except Exception:
+                        pass
+
+                # Find unique enterprise SSIDs
+                ent_ssids = set()
+                for xml_file in BACKUP_DIR.glob("*.xml"):
+                    try:
+                        content = xml_file.read_text(encoding="utf-8", errors="ignore")
+                        if "<useOneX>true</useOneX>" in content:
+                            name_part = xml_file.stem
+                            if name_part.startswith("Wi-Fi-"):
+                                name_part = name_part[6:]
+                            ent_ssids.add(name_part)
+                    except Exception:
+                        pass
+
+                # Prompt for each unique enterprise SSID sequentially
+                for ssid in sorted(ent_ssids):
+                    def_u = ent_creds.get(ssid, {}).get("user", "")
+                    dlg = EnterpriseCredentialDialog(self.root, ssid, self.icon_path, default_user=def_u)
+                    self.root.wait_window(dlg)
+                    
+                    if dlg.result:
+                        u, p = dlg.result
+                        ent_creds[ssid] = {"user": u, "pass": p}
+                
+                if ent_creds:
+                    CREDENTIALS_FILE.write_text(json.dumps(ent_creds, indent=2), encoding="utf-8")
+
                 self.lbl_status.config(text=f"STATUS: BACKED UP {count} PROFILES", fg=self.COLOR_INK)
-                messagebox.showinfo("WifiRescue by QuiNC", f"Successfully backed up {count} profiles to:\n{BACKUP_DIR}")
+                toast = CustomToast(self.root, "Sao Lưu Thành Công", f"Đã sao lưu thành công {count} cấu hình Wi-Fi vào thư mục:\n{BACKUP_DIR}", app_icon_path=self.icon_path)
+                self.root.wait_window(toast)
             else:
                 self.lbl_status.config(text="STATUS: BACKUP FAILED", fg="#EF4444")
-                messagebox.showerror("WifiRescue by QuiNC", f"Failed to export profiles.\n{result.stderr}")
+                toast = CustomToast(self.root, "Sao Lưu Thất Bại", f"Không thể xuất cấu hình Wi-Fi.\n{result.stderr}", is_error=True, app_icon_path=self.icon_path)
+                self.root.wait_window(toast)
         except Exception as e:
-            messagebox.showerror("Error", str(e))
+            toast = CustomToast(self.root, "Lỗi Hệ Thống", str(e), is_error=True, app_icon_path=self.icon_path)
+            self.root.wait_window(toast)
 
     def restore_wifi(self):
         if not BACKUP_DIR.exists():
-            messagebox.showwarning("WifiRescue by QuiNC", "No backup directory found in current app folder.")
+            CustomToast(self.root, "Cảnh Báo", "Không tìm thấy thư mục WiFi_Backup trong ứng dụng.", is_error=True, app_icon_path=self.icon_path)
             return
 
         xml_files = list(BACKUP_DIR.glob("*.xml"))
         if not xml_files:
-            messagebox.showwarning("WifiRescue by QuiNC", "No saved profile XML files found.")
+            CustomToast(self.root, "Cảnh Báo", "Không tìm thấy file cấu hình XML nào.", is_error=True, app_icon_path=self.icon_path)
             return
 
         existing_profiles = []
@@ -279,35 +487,53 @@ class CompactWifiApp:
         already_existed_count = 0
         failed_count = 0
 
+        # Load Enterprise credentials if available
+        ent_creds = {}
+        if CREDENTIALS_FILE.exists():
+            try:
+                ent_creds = json.loads(CREDENTIALS_FILE.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+
         for xml_file in xml_files:
             name_part = xml_file.stem
             if name_part.startswith("Wi-Fi-"):
                 name_part = name_part[6:]
 
-            if name_part.lower() in existing_profiles:
-                already_existed_count += 1
-                continue
-
-            cmd = f'netsh wlan add profile filename="{xml_file}" user=all'
-            res = subprocess.run(cmd, capture_output=True, text=True, shell=True)
-            if res.returncode == 0:
-                new_restored_count += 1
+            # Add profile
+            if name_part.lower() not in existing_profiles:
+                cmd = f'netsh wlan add profile filename="{xml_file}" user=all'
+                res = subprocess.run(cmd, capture_output=True, text=True, shell=True)
+                if res.returncode == 0:
+                    new_restored_count += 1
+                else:
+                    failed_count += 1
             else:
-                failed_count += 1
+                already_existed_count += 1
+
+            # Inject Enterprise Credentials via cmdkey if present
+            if name_part in ent_creds:
+                u = ent_creds[name_part]["user"]
+                p = ent_creds[name_part]["pass"]
+                target = f"Microsoft_Wlea_{name_part}"
+                cmd_cred = f'cmdkey /generic:{target} /user:"{u}" /pass:"{p}"'
+                subprocess.run(cmd_cred, capture_output=True, text=True, shell=True)
 
         total = len(xml_files)
-        if already_existed_count == total:
+        if already_existed_count == total and not ent_creds:
             self.lbl_status.config(text=f"STATUS: ALL {total} PROFILES ALREADY EXIST", fg=self.COLOR_INK)
-            messagebox.showinfo("WifiRescue by QuiNC", f"All {total} Wi-Fi profiles are already saved on this system.")
-        elif new_restored_count > 0:
-            msg = f"Successfully restored {new_restored_count} new Wi-Fi profile(s)."
-            if already_existed_count > 0:
-                msg += f"\n({already_existed_count} profile(s) already existed)."
-            self.lbl_status.config(text=f"STATUS: RESTORED {new_restored_count} NEW PROFILE(S)", fg=self.COLOR_INK)
-            messagebox.showinfo("WifiRescue by QuiNC", msg)
+            CustomToast(self.root, "Thông Báo", f"Toàn bộ {total} cấu hình Wi-Fi đã sẵn có trên máy tính này.", app_icon_path=self.icon_path)
+        elif new_restored_count > 0 or ent_creds:
+            msg = f"Đã khôi phục thành công các cấu hình Wi-Fi."
+            if new_restored_count > 0:
+                msg += f"\n• Nạp thêm: {new_restored_count} Wi-Fi mới."
+            if ent_creds:
+                msg += f"\n• Tự động đăng nhập tài khoản: {', '.join(ent_creds.keys())}"
+            self.lbl_status.config(text=f"STATUS: RESTORED SUCCESS", fg=self.COLOR_INK)
+            CustomToast(self.root, "Khôi Phục Thành Công", msg, app_icon_path=self.icon_path)
         else:
             self.lbl_status.config(text="STATUS: RESTORE FAILED", fg="#EF4444")
-            messagebox.showerror("WifiRescue by QuiNC", "Failed to restore Wi-Fi profiles.")
+            CustomToast(self.root, "Khôi Phục Thất Bại", "Không thể khôi phục các cấu hình Wi-Fi.", is_error=True, app_icon_path=self.icon_path)
 
     def open_backup_dir(self):
         if not BACKUP_DIR.exists():
@@ -318,3 +544,5 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = CompactWifiApp(root)
     root.mainloop()
+
+
