@@ -69,11 +69,13 @@ class ImpeccableDialog(tk.Toplevel):
         self.geometry(f"{width}x{height}+{max(0, x)}+{max(0, y)}")
         self.grab_set()
 
+GITHUB_PAGES_URL = "https://quinc-fptu.github.io/WifiRescue/"
+
 class UpdatePromptDialog(ImpeccableDialog):
     """Zinc-styled Remote Update Prompt Modal."""
-    def __init__(self, parent, latest_ver, download_url, release_notes="", app_icon_path=None):
+    def __init__(self, parent, latest_ver, download_url=None, release_notes="", app_icon_path=None):
         super().__init__(parent, "Cập Nhật Phiên Bản Mới", app_icon_path)
-        self.download_url = download_url
+        self.download_url = GITHUB_PAGES_URL
 
         # Header
         head = tk.Frame(self, bg=self.BG, padx=18, pady=12)
@@ -88,7 +90,7 @@ class UpdatePromptDialog(ImpeccableDialog):
         body = tk.Frame(self, bg=self.BG, padx=18, pady=10)
         body.pack(fill="both", expand=True)
 
-        msg_text = f"Phiên bản WifiRescue {latest_ver} đã có sẵn trên GitHub.\n"
+        msg_text = f"Phiên bản WifiRescue {latest_ver} đã sẵn sàng.\n"
         if release_notes:
             msg_text += f"\nNội dung cập nhật:\n{release_notes[:150]}"
 
@@ -110,7 +112,7 @@ class UpdatePromptDialog(ImpeccableDialog):
 
         btn_download = tk.Button(
             btn_box,
-            text="TẢI BẢN MỚI",
+            text="MỞ TRANG TẢI VỀ",
             font=("Segoe UI", 8, "bold"),
             bg="#10B981",
             fg="#09090B",
@@ -145,8 +147,7 @@ class UpdatePromptDialog(ImpeccableDialog):
         self.center_modal(360, 260)
 
     def on_download(self):
-        if self.download_url:
-            webbrowser.open(self.download_url)
+        webbrowser.open(GITHUB_PAGES_URL)
         self.destroy()
 
 class EnterpriseCredentialDialog(ImpeccableDialog):
