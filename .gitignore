@@ -4,7 +4,11 @@ dist/
 __pycache__/
 *.pyc
 
+# Local backup directory (Contains private Wi-Fi profiles & passwords)
+WiFi_Backup/
+
 # Local / IDE files
 .vscode/
 SyncBackground/
 ~$*
+
