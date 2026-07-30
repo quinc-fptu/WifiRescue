@@ -17,6 +17,15 @@ Tác giả: **QuiNC** · Phiên bản: **v1.2.0**
 
 ---
 
+## 💡 Lưu Ý Về Wi-Fi Trường (FU-Students / WPA2 Enterprise)
+
+- **Vì sao cần nhập tài khoản 1 lần khi Backup?**  
+  Khác với Wi-Fi cá nhân (WPA2-Personal) lưu mật khẩu rõ ràng trong file XML, Wi-Fi trường học (**FU-Students**) sử dụng mã hóa doanh nghiệp **802.1X (EAP-PEAP)**. Mật khẩu được Windows mã hóa 1 chiều bảo mật trong hệ thống (LSA Secrets) nên không thể trích xuất trực tiếp dạng văn bản thô.
+- **Giải pháp của WifiRescue:**  
+  Bạn chỉ cần nhập Username/Password **1 lần duy nhất** khi bấm Backup. Thông tin này sẽ được lưu an toàn trong file `enterprise_credentials.json` đi kèm. Khi sang máy mới hoặc sau khi thi xong, bấm **RESTORE PROFILES** thì tool sẽ tự động đăng nhập vào Windows Credential Manager mà **không bao giờ phải nhập lại nữa!**
+
+---
+
 ## 📖 Hướng Dẫn Sử Dụng
 
 1. **Tải về & Giải nén:** Tải `WifiRescue.zip` từ [Releases](https://github.com/quinc-fptu/WifiRescue/releases) và giải nén ra thư mục.
@@ -32,5 +41,6 @@ Tác giả: **QuiNC** · Phiên bản: **v1.2.0**
 
 ## 🛡️ Bản Quyền
 Copyright (c) 2026 QuiNC. All rights reserved.
+
 
 
