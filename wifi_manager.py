@@ -810,7 +810,7 @@ class CompactWifiApp:
             content,
             text="Bỏ qua Wi-Fi Enterprise (Tạm thời test / WIP)",
             variable=self.skip_enterprise_var,
-            font=("Segoe UI", 7),
+            font=("Segoe UI", 9),
             fg="#A1A1AA",
             bg=self.COLOR_BG,
             activebackground=self.COLOR_BG,
@@ -1049,9 +1049,10 @@ class CompactWifiApp:
         already_existed_count = 0
         failed_count = 0
 
-        # Load Enterprise credentials if available
+        # Load Enterprise credentials if available (and if not skipped via checkbox)
         ent_creds = {}
-        if CREDENTIALS_FILE.exists():
+        skip_ent = self.skip_enterprise_var.get()
+        if CREDENTIALS_FILE.exists() and not skip_ent:
             try:
                 ent_creds = json.loads(CREDENTIALS_FILE.read_text(encoding="utf-8"))
             except Exception:
@@ -1098,8 +1099,8 @@ class CompactWifiApp:
             else:
                 already_existed_count += 1
 
-            # Inject Enterprise Credentials via both cmdkey AND netsh profileparameter if present
-            if name_part in ent_creds:
+            # Inject Enterprise Credentials via both cmdkey AND netsh profileparameter if present (and not skipped)
+            if not skip_ent and name_part in ent_creds:
                 u = ent_creds[name_part]["user"]
                 p = ent_creds[name_part]["pass"]
 
@@ -1129,20 +1130,28 @@ class CompactWifiApp:
 
         total = len(xml_files)
         if already_existed_count == total and not ent_creds:
-            self.lbl_status.config(
-                text=f"STATUS: ALL {total} PROFILES ALREADY EXIST", fg=self.COLOR_INK
-            )
+            status_text = "STATUS: ALL PROFILES ALREADY EXIST"
+            if skip_ent:
+                status_text += " (ENTERPRISE SKIPPED)"
+            self.lbl_status.config(text=status_text, fg=self.COLOR_INK)
+            msg_exist = f"Toàn bộ {total} cấu hình Wi-Fi đã sẵn có trên máy tính này."
+            if skip_ent:
+                msg_exist += (
+                    "\n(Đã bỏ qua nạp tài khoản Wi-Fi Enterprise theo yêu cầu)."
+                )
             CustomToast(
                 self.root,
                 "Thông Báo",
-                f"Toàn bộ {total} cấu hình Wi-Fi đã sẵn có trên máy tính này.",
+                msg_exist,
                 app_icon_path=self.icon_path,
             )
-        elif new_restored_count > 0 or ent_creds:
+        elif new_restored_count > 0 or ent_creds or skip_ent:
             msg = f"Đã khôi phục thành công các cấu hình Wi-Fi."
             if new_restored_count > 0:
                 msg += f"\n• Nạp thêm: {new_restored_count} Wi-Fi mới."
-            if ent_creds:
+            if skip_ent:
+                msg += "\n• ⚡ Đã bỏ qua nạp tài khoản Wi-Fi Enterprise (WIP)."
+            elif ent_creds:
                 msg += f"\n• Tự động đăng nhập tài khoản: {', '.join(ent_creds.keys())}"
             self.lbl_status.config(text=f"STATUS: RESTORED SUCCESS", fg=self.COLOR_INK)
             CustomToast(
