@@ -14,7 +14,7 @@ __version__ = "1.3.0"
 GITHUB_REPO = "quinc-fptu/WifiRescue"
 
 # Application directory configuration
-if getattr(sys, 'frozen', False):
+if getattr(sys, "frozen", False):
     APP_DIR = Path(sys.executable).parent
     BUNDLE_DIR = Path(sys._MEIPASS)
 else:
@@ -27,12 +27,17 @@ CREDENTIALS_FILE = BACKUP_DIR / "enterprise_credentials.json"
 # Windows AppUserModelID for taskbar icon binding
 try:
     import ctypes
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("QuiNC.WifiRescue.App.1.3")
+
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+        "QuiNC.WifiRescue.App.1.3"
+    )
 except Exception:
     pass
 
+
 class ImpeccableDialog(tk.Toplevel):
     """Custom Zinc-themed dialog modal matching the main app aesthetics."""
+
     def __init__(self, parent, title, app_icon_path=None):
         super().__init__(parent)
         self.title(title)
@@ -69,11 +74,21 @@ class ImpeccableDialog(tk.Toplevel):
         self.geometry(f"{width}x{height}+{max(0, x)}+{max(0, y)}")
         self.grab_set()
 
+
 GITHUB_PAGES_URL = "https://quinc-fptu.github.io/WifiRescue/"
+
 
 class UpdatePromptDialog(ImpeccableDialog):
     """Zinc-styled Remote Update Prompt Modal."""
-    def __init__(self, parent, latest_ver, download_url=None, release_notes="", app_icon_path=None):
+
+    def __init__(
+        self,
+        parent,
+        latest_ver,
+        download_url=None,
+        release_notes="",
+        app_icon_path=None,
+    ):
         super().__init__(parent, "Cập Nhật Phiên Bản Mới", app_icon_path)
         self.download_url = GITHUB_PAGES_URL
 
@@ -81,8 +96,20 @@ class UpdatePromptDialog(ImpeccableDialog):
         head = tk.Frame(self, bg=self.BG, padx=18, pady=12)
         head.pack(fill="x")
 
-        tk.Label(head, text=f"🎉 Đã Có Phiên Bản Mới ({latest_ver})", font=("Segoe UI", 10, "bold"), fg="#10B981", bg=self.BG).pack(anchor="w")
-        tk.Label(head, text=f"Bạn đang dùng v{__version__}. Khuyên dùng bản mới nhất!", font=("Segoe UI", 8), fg=self.MUTED, bg=self.BG).pack(anchor="w", pady=(2, 0))
+        tk.Label(
+            head,
+            text=f"🎉 Đã Có Phiên Bản Mới ({latest_ver})",
+            font=("Segoe UI", 10, "bold"),
+            fg="#10B981",
+            bg=self.BG,
+        ).pack(anchor="w")
+        tk.Label(
+            head,
+            text=f"Bạn đang dùng v{__version__}. Khuyên dùng bản mới nhất!",
+            font=("Segoe UI", 8),
+            fg=self.MUTED,
+            bg=self.BG,
+        ).pack(anchor="w", pady=(2, 0))
 
         tk.Frame(self, bg=self.BORDER, height=1).pack(fill="x", padx=18)
 
@@ -92,7 +119,12 @@ class UpdatePromptDialog(ImpeccableDialog):
 
         msg_text = f"Phiên bản WifiRescue {latest_ver} đã sẵn sàng.\n"
         if release_notes:
-            cleaned_notes = release_notes.replace("###", "").replace("**", "").replace("---", "").strip()
+            cleaned_notes = (
+                release_notes.replace("###", "")
+                .replace("**", "")
+                .replace("---", "")
+                .strip()
+            )
             msg_text += f"\nNội dung cập nhật:\n{cleaned_notes[:180]}"
 
         msg_lbl = tk.Label(
@@ -103,7 +135,7 @@ class UpdatePromptDialog(ImpeccableDialog):
             bg=self.BG,
             justify="left",
             wraplength=310,
-            anchor="nw"
+            anchor="nw",
         )
         msg_lbl.pack(fill="both", expand=True)
 
@@ -124,7 +156,7 @@ class UpdatePromptDialog(ImpeccableDialog):
             cursor="hand2",
             padx=12,
             pady=5,
-            command=self.on_download
+            command=self.on_download,
         )
         btn_download.pack(side="right", padx=(6, 0))
 
@@ -141,7 +173,7 @@ class UpdatePromptDialog(ImpeccableDialog):
             cursor="hand2",
             padx=12,
             pady=5,
-            command=self.destroy
+            command=self.destroy,
         )
         btn_later.pack(side="right")
 
@@ -151,8 +183,10 @@ class UpdatePromptDialog(ImpeccableDialog):
         webbrowser.open(GITHUB_PAGES_URL)
         self.destroy()
 
+
 class EnterpriseCredentialDialog(ImpeccableDialog):
     """Custom dialog for entering Enterprise Wi-Fi credentials with Show/Hide password toggle."""
+
     def __init__(self, parent, ssid_name, app_icon_path=None, default_user=""):
         super().__init__(parent, f"Wi-Fi Credentials - {ssid_name}", app_icon_path)
         self.result = None
@@ -160,9 +194,23 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
         # Header
         head = tk.Frame(self, bg=self.BG, padx=18, pady=12)
         head.pack(fill="x")
-        
-        tk.Label(head, text=f"🔑 Wi-Fi Trường ({ssid_name})", font=("Segoe UI", 10, "bold"), fg=self.INK, bg=self.BG).pack(anchor="w")
-        tk.Label(head, text="Tùy chọn: Nhập tài khoản để tự động lưu & khôi phục (WIP - Có thể chưa hoạt động tùy bản Windows). Bấm Bỏ Qua nếu chỉ muốn sao lưu Wi-Fi thường.", font=("Segoe UI", 7), fg=self.MUTED, bg=self.BG, wraplength=300, justify="left").pack(anchor="w", pady=(2, 0))
+
+        tk.Label(
+            head,
+            text=f"🔑 Wi-Fi Trường ({ssid_name})",
+            font=("Segoe UI", 10, "bold"),
+            fg=self.INK,
+            bg=self.BG,
+        ).pack(anchor="w")
+        tk.Label(
+            head,
+            text="Tùy chọn: Nhập tài khoản để tự động lưu & khôi phục (WIP - Có thể chưa hoạt động tùy bản Windows). Bấm Bỏ Qua nếu chỉ muốn sao lưu Wi-Fi thường.",
+            font=("Segoe UI", 7),
+            fg=self.MUTED,
+            bg=self.BG,
+            wraplength=300,
+            justify="left",
+        ).pack(anchor="w", pady=(2, 0))
 
         tk.Frame(self, bg=self.BORDER, height=1).pack(fill="x", padx=18)
 
@@ -171,12 +219,28 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
         body.pack(fill="both", expand=True)
 
         # Username Field
-        tk.Label(body, text="USERNAME / MSSV", font=("Segoe UI", 8, "bold"), fg="#71717A", bg=self.BG).pack(anchor="w")
-        
-        u_frame = tk.Frame(body, bg=self.SURFACE, highlightbackground=self.BORDER, highlightthickness=1)
+        tk.Label(
+            body,
+            text="USERNAME / MSSV",
+            font=("Segoe UI", 8, "bold"),
+            fg="#71717A",
+            bg=self.BG,
+        ).pack(anchor="w")
+
+        u_frame = tk.Frame(
+            body, bg=self.SURFACE, highlightbackground=self.BORDER, highlightthickness=1
+        )
         u_frame.pack(fill="x", pady=(3, 8))
-        
-        self.ent_user = tk.Entry(u_frame, font=("Segoe UI", 9), bg=self.SURFACE, fg=self.INK, insertbackground=self.INK, bd=0, relief="flat")
+
+        self.ent_user = tk.Entry(
+            u_frame,
+            font=("Segoe UI", 9),
+            bg=self.SURFACE,
+            fg=self.INK,
+            insertbackground=self.INK,
+            bd=0,
+            relief="flat",
+        )
         self.ent_user.pack(fill="x", padx=8, pady=5)
         if default_user:
             self.ent_user.insert(0, default_user)
@@ -184,16 +248,40 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
             self.ent_user.focus_set()
 
         # Password Field
-        tk.Label(body, text="PASSWORD / MẬT KHẨU", font=("Segoe UI", 8, "bold"), fg="#71717A", bg=self.BG).pack(anchor="w")
+        tk.Label(
+            body,
+            text="PASSWORD / MẬT KHẨU",
+            font=("Segoe UI", 8, "bold"),
+            fg="#71717A",
+            bg=self.BG,
+        ).pack(anchor="w")
 
-        p_frame = tk.Frame(body, bg=self.SURFACE, highlightbackground=self.BORDER, highlightthickness=1)
+        p_frame = tk.Frame(
+            body, bg=self.SURFACE, highlightbackground=self.BORDER, highlightthickness=1
+        )
         p_frame.pack(fill="x", pady=(3, 6))
 
-        self.ent_pass = tk.Entry(p_frame, font=("Segoe UI", 9), bg=self.SURFACE, fg=self.INK, insertbackground=self.INK, bd=0, relief="flat", show="•")
+        self.ent_pass = tk.Entry(
+            p_frame,
+            font=("Segoe UI", 9),
+            bg=self.SURFACE,
+            fg=self.INK,
+            insertbackground=self.INK,
+            bd=0,
+            relief="flat",
+            show="•",
+        )
         self.ent_pass.pack(side="left", fill="x", expand=True, padx=(8, 4), pady=5)
 
         self.show_pwd = False
-        self.btn_toggle = tk.Label(p_frame, text="👁", font=("Segoe UI", 9), fg="#71717A", bg=self.SURFACE, cursor="hand2")
+        self.btn_toggle = tk.Label(
+            p_frame,
+            text="👁",
+            font=("Segoe UI", 9),
+            fg="#71717A",
+            bg=self.SURFACE,
+            cursor="hand2",
+        )
         self.btn_toggle.pack(side="right", padx=6)
         self.btn_toggle.bind("<Button-1>", self.toggle_password_visibility)
 
@@ -214,7 +302,7 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
             cursor="hand2",
             padx=12,
             pady=5,
-            command=self.on_save
+            command=self.on_save,
         )
         btn_save.pack(side="right", padx=(6, 0))
 
@@ -231,7 +319,7 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
             cursor="hand2",
             padx=12,
             pady=5,
-            command=self.destroy
+            command=self.destroy,
         )
         btn_skip.pack(side="right")
 
@@ -253,8 +341,10 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
             self.result = (u, p)
             self.destroy()
 
+
 class CustomToast(ImpeccableDialog):
     """Zinc-styled Notification Toast Modal with auto-calculated height & perfect centering."""
+
     def __init__(self, parent, title, message, is_error=False, app_icon_path=None):
         super().__init__(parent, title, app_icon_path)
 
@@ -268,7 +358,7 @@ class CustomToast(ImpeccableDialog):
             text=icon_str + title,
             font=("Segoe UI", 10, "bold"),
             fg="#EF4444" if is_error else "#10B981",
-            bg=self.BG
+            bg=self.BG,
         )
         lbl.pack(anchor="w")
 
@@ -286,7 +376,7 @@ class CustomToast(ImpeccableDialog):
             bg=self.BG,
             justify="left",
             wraplength=280,
-            anchor="nw"
+            anchor="nw",
         )
         msg_lbl.pack(fill="both", expand=True)
 
@@ -306,14 +396,16 @@ class CustomToast(ImpeccableDialog):
             bd=0,
             cursor="hand2",
             pady=5,
-            command=self.destroy
+            command=self.destroy,
         )
         btn_close.pack(fill="x")
 
         self.center_modal(320, 180)
 
+
 class ChangelogDialog(ImpeccableDialog):
     """Zinc-styled Changelog Modal."""
+
     def __init__(self, parent, app_icon_path=None):
         super().__init__(parent, "Changelog - WifiRescue", app_icon_path)
 
@@ -321,8 +413,20 @@ class ChangelogDialog(ImpeccableDialog):
         head = tk.Frame(self, bg=self.BG, padx=18, pady=12)
         head.pack(fill="x")
 
-        tk.Label(head, text="🚀 NHẬT KÝ THAY ĐỔI (CHANGELOG)", font=("Segoe UI", 10, "bold"), fg=self.INK, bg=self.BG).pack(anchor="w")
-        tk.Label(head, text=f"WifiRescue by QuiNC · Hiện tại: v{__version__}", font=("Segoe UI", 8), fg=self.MUTED, bg=self.BG).pack(anchor="w", pady=(2, 0))
+        tk.Label(
+            head,
+            text="🚀 NHẬT KÝ THAY ĐỔI (CHANGELOG)",
+            font=("Segoe UI", 10, "bold"),
+            fg=self.INK,
+            bg=self.BG,
+        ).pack(anchor="w")
+        tk.Label(
+            head,
+            text=f"WifiRescue by QuiNC · Hiện tại: v{__version__}",
+            font=("Segoe UI", 8),
+            fg=self.MUTED,
+            bg=self.BG,
+        ).pack(anchor="w", pady=(2, 0))
 
         tk.Frame(self, bg=self.BORDER, height=1).pack(fill="x", padx=18)
 
@@ -356,7 +460,7 @@ class ChangelogDialog(ImpeccableDialog):
             fg="#D4D4D8",
             bg=self.BG,
             justify="left",
-            anchor="nw"
+            anchor="nw",
         )
         txt.pack(fill="both", expand=True)
 
@@ -375,7 +479,7 @@ class ChangelogDialog(ImpeccableDialog):
             bd=0,
             cursor="hand2",
             pady=5,
-            command=self.destroy
+            command=self.destroy,
         )
         btn_close.pack(fill="x")
 
@@ -384,6 +488,7 @@ class ChangelogDialog(ImpeccableDialog):
 
 class ManageProfilesDialog(ImpeccableDialog):
     """Dialog for listing all saved Windows Wi-Fi profiles and selectively deleting/forgetting them."""
+
     def __init__(self, parent, app_icon_path=None):
         super().__init__(parent, "Quản Lý Wi-Fi Đã Lưu", app_icon_path)
 
@@ -391,8 +496,20 @@ class ManageProfilesDialog(ImpeccableDialog):
         head = tk.Frame(self, bg=self.BG, padx=18, pady=12)
         head.pack(fill="x")
 
-        tk.Label(head, text="📶 DANH SÁCH WI-FI ĐÃ LƯU TRÊN MÁY", font=("Segoe UI", 10, "bold"), fg=self.INK, bg=self.BG).pack(anchor="w")
-        tk.Label(head, text="Chọn mạng Wi-Fi và bấm Xóa để Forget profile khỏi Windows.", font=("Segoe UI", 8), fg=self.MUTED, bg=self.BG).pack(anchor="w", pady=(2, 0))
+        tk.Label(
+            head,
+            text="📶 DANH SÁCH WI-FI ĐÃ LƯU TRÊN MÁY",
+            font=("Segoe UI", 10, "bold"),
+            fg=self.INK,
+            bg=self.BG,
+        ).pack(anchor="w")
+        tk.Label(
+            head,
+            text="Chọn mạng Wi-Fi và bấm Xóa để Forget profile khỏi Windows.",
+            font=("Segoe UI", 8),
+            fg=self.MUTED,
+            bg=self.BG,
+        ).pack(anchor="w", pady=(2, 0))
 
         tk.Frame(self, bg=self.BORDER, height=1).pack(fill="x", padx=18)
 
@@ -400,7 +517,9 @@ class ManageProfilesDialog(ImpeccableDialog):
         body = tk.Frame(self, bg=self.BG, padx=18, pady=10)
         body.pack(fill="both", expand=True)
 
-        list_frame = tk.Frame(body, bg=self.SURFACE, highlightbackground=self.BORDER, highlightthickness=1)
+        list_frame = tk.Frame(
+            body, bg=self.SURFACE, highlightbackground=self.BORDER, highlightthickness=1
+        )
         list_frame.pack(fill="both", expand=True)
 
         scrollbar = tk.Scrollbar(list_frame, orient="vertical")
@@ -416,7 +535,7 @@ class ManageProfilesDialog(ImpeccableDialog):
             bd=0,
             relief="flat",
             highlightthickness=0,
-            yscrollcommand=scrollbar.set
+            yscrollcommand=scrollbar.set,
         )
         self.listbox.pack(fill="both", expand=True, padx=4, pady=4)
         scrollbar.config(command=self.listbox.yview)
@@ -438,7 +557,7 @@ class ManageProfilesDialog(ImpeccableDialog):
             cursor="hand2",
             padx=12,
             pady=5,
-            command=self.delete_selected
+            command=self.delete_selected,
         )
         btn_delete.pack(side="right", padx=(6, 0))
 
@@ -455,7 +574,7 @@ class ManageProfilesDialog(ImpeccableDialog):
             cursor="hand2",
             padx=12,
             pady=5,
-            command=self.destroy
+            command=self.destroy,
         )
         btn_close.pack(side="right")
 
@@ -465,7 +584,14 @@ class ManageProfilesDialog(ImpeccableDialog):
     def load_profiles(self):
         self.listbox.delete(0, tk.END)
         try:
-            res = subprocess.run('netsh wlan show profiles', capture_output=True, text=True, shell=True, encoding='utf-8', errors='ignore')
+            res = subprocess.run(
+                "netsh wlan show profiles",
+                capture_output=True,
+                text=True,
+                shell=True,
+                encoding="utf-8",
+                errors="ignore",
+            )
             profiles = []
             for line in res.stdout.splitlines():
                 if ":" in line:
@@ -492,16 +618,19 @@ class ManageProfilesDialog(ImpeccableDialog):
         if res.returncode == 0:
             # Also clean up WLEA credential if present
             target = f"Microsoft_Wlea_{item_text}"
-            subprocess.run(f'cmdkey /delete:{target}', capture_output=True, text=True, shell=True)
+            subprocess.run(
+                f"cmdkey /delete:{target}", capture_output=True, text=True, shell=True
+            )
             self.load_profiles()
         else:
             messagebox.showerror("Lỗi", f"Không thể xóa profile: {res.stderr}")
+
 
 class CompactWifiApp:
     def __init__(self, root):
         self.root = root
         self.root.title("WifiRescue - by QuiNC")
-        self.root.geometry("340x260")
+        self.root.geometry("340x290")
         self.root.resizable(False, False)
 
         self.icon_path = BUNDLE_DIR / "app_icon_flat.ico"
@@ -541,11 +670,22 @@ class CompactWifiApp:
                 if response.status == 200:
                     data = json.loads(response.read().decode("utf-8"))
                     latest_tag = data.get("tag_name", "").lstrip("v")
-                    html_url = data.get("html_url", f"https://github.com/{GITHUB_REPO}/releases")
+                    html_url = data.get(
+                        "html_url", f"https://github.com/{GITHUB_REPO}/releases"
+                    )
                     notes = data.get("body", "")
 
                     if latest_tag and self.is_newer_version(latest_tag, __version__):
-                        self.root.after(0, lambda: UpdatePromptDialog(self.root, f"v{latest_tag}", html_url, notes, self.icon_path))
+                        self.root.after(
+                            0,
+                            lambda: UpdatePromptDialog(
+                                self.root,
+                                f"v{latest_tag}",
+                                html_url,
+                                notes,
+                                self.icon_path,
+                            ),
+                        )
         except Exception:
             pass
 
@@ -570,7 +710,7 @@ class CompactWifiApp:
             font=self.FONT_TITLE,
             fg=self.COLOR_INK,
             bg=self.COLOR_BG,
-            anchor="w"
+            anchor="w",
         )
         lbl_title.pack(side="left")
 
@@ -583,7 +723,7 @@ class CompactWifiApp:
             font=self.FONT_SMALL,
             fg="#10B981",
             bg=self.COLOR_BG,
-            cursor="hand2"
+            cursor="hand2",
         )
         btn_ver.pack(side="left", padx=(0, 8))
         btn_ver.bind("<Button-1>", lambda e: self.show_changelog_popup())
@@ -594,7 +734,7 @@ class CompactWifiApp:
             font=self.FONT_SMALL,
             fg=self.COLOR_MUTED,
             bg=self.COLOR_BG,
-            cursor="hand2"
+            cursor="hand2",
         )
         btn_help.pack(side="left", padx=(0, 8))
         btn_help.bind("<Button-1>", lambda e: self.show_help_popup())
@@ -605,7 +745,7 @@ class CompactWifiApp:
             font=self.FONT_SMALL,
             fg=self.COLOR_MUTED,
             bg=self.COLOR_BG,
-            cursor="hand2"
+            cursor="hand2",
         )
         btn_folder.pack(side="left")
         btn_folder.bind("<Button-1>", lambda e: self.open_backup_dir())
@@ -628,7 +768,7 @@ class CompactWifiApp:
             bd=0,
             cursor="hand2",
             pady=8,
-            command=self.backup_wifi
+            command=self.backup_wifi,
         )
         self.btn_backup.pack(fill="x", pady=(0, 8))
 
@@ -644,7 +784,7 @@ class CompactWifiApp:
             bd=0,
             cursor="hand2",
             pady=8,
-            command=self.restore_wifi
+            command=self.restore_wifi,
         )
         self.btn_restore.pack(fill="x", pady=(0, 8))
 
@@ -660,9 +800,27 @@ class CompactWifiApp:
             bd=0,
             cursor="hand2",
             pady=6,
-            command=self.show_manage_popup
+            command=self.show_manage_popup,
         )
-        self.btn_manage.pack(fill="x")
+        self.btn_manage.pack(fill="x", pady=(0, 8))
+
+        # Checkbox Option to Skip Enterprise Prompt (WIP)
+        self.skip_enterprise_var = tk.BooleanVar(value=False)
+        self.chk_skip_ent = tk.Checkbutton(
+            content,
+            text="Bỏ qua Wi-Fi Enterprise (Tạm thời test / WIP)",
+            variable=self.skip_enterprise_var,
+            font=("Segoe UI", 7),
+            fg="#A1A1AA",
+            bg=self.COLOR_BG,
+            activebackground=self.COLOR_BG,
+            activeforeground=self.COLOR_INK,
+            selectcolor=self.COLOR_SURFACE,
+            bd=0,
+            highlightthickness=0,
+            anchor="w",
+        )
+        self.chk_skip_ent.pack(fill="x")
 
         # Footer Status Bar
         footer = tk.Frame(self.root, bg=self.COLOR_BG, padx=16, pady=8)
@@ -674,7 +832,7 @@ class CompactWifiApp:
             font=self.FONT_SMALL,
             fg=self.COLOR_MUTED,
             bg=self.COLOR_BG,
-            anchor="w"
+            anchor="w",
         )
         self.lbl_status.pack(side="left")
 
@@ -684,7 +842,7 @@ class CompactWifiApp:
             font=self.FONT_SIG,
             fg=self.COLOR_WATERMARK,
             bg=self.COLOR_BG,
-            anchor="e"
+            anchor="e",
         )
         lbl_sig.pack(side="right")
 
@@ -695,14 +853,28 @@ class CompactWifiApp:
         ManageProfilesDialog(self.root, self.icon_path)
 
     def show_help_popup(self):
-        popup = ImpeccableDialog(self.root, "Hướng Dẫn Sử Dụng - WifiRescue", self.icon_path)
+        popup = ImpeccableDialog(
+            self.root, "Hướng Dẫn Sử Dụng - WifiRescue", self.icon_path
+        )
 
         # Header
         head = tk.Frame(popup, bg=popup.BG, padx=18, pady=12)
         head.pack(fill="x")
-        
-        tk.Label(head, text="📖 HƯỚNG DẪN SỬ DỤNG", font=("Segoe UI", 10, "bold"), fg=popup.INK, bg=popup.BG).pack(anchor="w")
-        tk.Label(head, text="Tác giả: QuiNC · Phiên bản Portable", font=("Segoe UI", 8), fg=popup.MUTED, bg=popup.BG).pack(anchor="w", pady=(2, 0))
+
+        tk.Label(
+            head,
+            text="📖 HƯỚNG DẪN SỬ DỤNG",
+            font=("Segoe UI", 10, "bold"),
+            fg=popup.INK,
+            bg=popup.BG,
+        ).pack(anchor="w")
+        tk.Label(
+            head,
+            text="Tác giả: QuiNC · Phiên bản Portable",
+            font=("Segoe UI", 8),
+            fg=popup.MUTED,
+            bg=popup.BG,
+        ).pack(anchor="w", pady=(2, 0))
 
         tk.Frame(popup, bg=popup.BORDER, height=1).pack(fill="x", padx=18)
 
@@ -728,7 +900,7 @@ class CompactWifiApp:
             fg="#D4D4D8",
             bg=popup.BG,
             justify="left",
-            anchor="nw"
+            anchor="nw",
         )
         txt.pack(fill="both", expand=True)
 
@@ -747,7 +919,7 @@ class CompactWifiApp:
             bd=0,
             cursor="hand2",
             pady=5,
-            command=popup.destroy
+            command=popup.destroy,
         )
         btn_close.pack(fill="x")
 
@@ -761,12 +933,14 @@ class CompactWifiApp:
 
             if result.returncode == 0:
                 count = len(list(BACKUP_DIR.glob("*.xml")))
-                
+
                 # Check for Enterprise SSIDs (like FU-Students, FU-Exams)
                 ent_creds = {}
                 if CREDENTIALS_FILE.exists():
                     try:
-                        ent_creds = json.loads(CREDENTIALS_FILE.read_text(encoding="utf-8"))
+                        ent_creds = json.loads(
+                            CREDENTIALS_FILE.read_text(encoding="utf-8")
+                        )
                     except Exception:
                         pass
 
@@ -783,43 +957,86 @@ class CompactWifiApp:
                     except Exception:
                         pass
 
-                # Prompt for each unique enterprise SSID sequentially
-                for ssid in sorted(ent_ssids):
-                    def_u = ent_creds.get(ssid, {}).get("user", "")
-                    dlg = EnterpriseCredentialDialog(self.root, ssid, self.icon_path, default_user=def_u)
-                    self.root.wait_window(dlg)
-                    
-                    if dlg.result:
-                        u, p = dlg.result
-                        ent_creds[ssid] = {"user": u, "pass": p}
-                
-                if ent_creds:
-                    CREDENTIALS_FILE.write_text(json.dumps(ent_creds, indent=2), encoding="utf-8")
+                # Prompt for each unique enterprise SSID sequentially (unless skipped via checkbox)
+                if not self.skip_enterprise_var.get():
+                    for ssid in sorted(ent_ssids):
+                        def_u = ent_creds.get(ssid, {}).get("user", "")
+                        dlg = EnterpriseCredentialDialog(
+                            self.root, ssid, self.icon_path, default_user=def_u
+                        )
+                        self.root.wait_window(dlg)
 
-                self.lbl_status.config(text=f"STATUS: BACKED UP {count} PROFILES", fg=self.COLOR_INK)
-                toast = CustomToast(self.root, "Sao Lưu Thành Công", f"Đã sao lưu thành công {count} cấu hình Wi-Fi vào thư mục:\n{BACKUP_DIR}", app_icon_path=self.icon_path)
+                        if dlg.result:
+                            u, p = dlg.result
+                            ent_creds[ssid] = {"user": u, "pass": p}
+
+                    if ent_creds:
+                        CREDENTIALS_FILE.write_text(
+                            json.dumps(ent_creds, indent=2), encoding="utf-8"
+                        )
+
+                self.lbl_status.config(
+                    text=f"STATUS: BACKED UP {count} PROFILES", fg=self.COLOR_INK
+                )
+                toast = CustomToast(
+                    self.root,
+                    "Sao Lưu Thành Công",
+                    f"Đã sao lưu thành công {count} cấu hình Wi-Fi vào thư mục:\n{BACKUP_DIR}",
+                    app_icon_path=self.icon_path,
+                )
                 self.root.wait_window(toast)
             else:
                 self.lbl_status.config(text="STATUS: BACKUP FAILED", fg="#EF4444")
-                toast = CustomToast(self.root, "Sao Lưu Thất Bại", f"Không thể xuất cấu hình Wi-Fi.\n{result.stderr}", is_error=True, app_icon_path=self.icon_path)
+                toast = CustomToast(
+                    self.root,
+                    "Sao Lưu Thất Bại",
+                    f"Không thể xuất cấu hình Wi-Fi.\n{result.stderr}",
+                    is_error=True,
+                    app_icon_path=self.icon_path,
+                )
                 self.root.wait_window(toast)
         except Exception as e:
-            toast = CustomToast(self.root, "Lỗi Hệ Thống", str(e), is_error=True, app_icon_path=self.icon_path)
+            toast = CustomToast(
+                self.root,
+                "Lỗi Hệ Thống",
+                str(e),
+                is_error=True,
+                app_icon_path=self.icon_path,
+            )
             self.root.wait_window(toast)
 
     def restore_wifi(self):
         if not BACKUP_DIR.exists():
-            CustomToast(self.root, "Cảnh Báo", "Không tìm thấy thư mục WiFi_Backup trong ứng dụng.", is_error=True, app_icon_path=self.icon_path)
+            CustomToast(
+                self.root,
+                "Cảnh Báo",
+                "Không tìm thấy thư mục WiFi_Backup trong ứng dụng.",
+                is_error=True,
+                app_icon_path=self.icon_path,
+            )
             return
 
         xml_files = list(BACKUP_DIR.glob("*.xml"))
         if not xml_files:
-            CustomToast(self.root, "Cảnh Báo", "Không tìm thấy file cấu hình XML nào.", is_error=True, app_icon_path=self.icon_path)
+            CustomToast(
+                self.root,
+                "Cảnh Báo",
+                "Không tìm thấy file cấu hình XML nào.",
+                is_error=True,
+                app_icon_path=self.icon_path,
+            )
             return
 
         existing_profiles = []
         try:
-            show_res = subprocess.run('netsh wlan show profiles', capture_output=True, text=True, shell=True, encoding='utf-8', errors='ignore')
+            show_res = subprocess.run(
+                "netsh wlan show profiles",
+                capture_output=True,
+                text=True,
+                shell=True,
+                encoding="utf-8",
+                errors="ignore",
+            )
             for line in show_res.stdout.splitlines():
                 if ":" in line:
                     profile_name = line.split(":", 1)[1].strip()
@@ -853,10 +1070,19 @@ class CompactWifiApp:
                     is_enterprise = True
                     # Patch XML to ensure cacheCredentials is set to true if missing
                     if "<cacheCredentials>false</cacheCredentials>" in xml_content:
-                        xml_content = xml_content.replace("<cacheCredentials>false</cacheCredentials>", "<cacheCredentials>true</cacheCredentials>")
+                        xml_content = xml_content.replace(
+                            "<cacheCredentials>false</cacheCredentials>",
+                            "<cacheCredentials>true</cacheCredentials>",
+                        )
                         xml_file.write_text(xml_content, encoding="utf-8")
-                    elif "<cacheCredentials>" not in xml_content and "</OneX>" in xml_content:
-                        xml_content = xml_content.replace("</OneX>", "    <cacheCredentials>true</cacheCredentials>\n    </OneX>")
+                    elif (
+                        "<cacheCredentials>" not in xml_content
+                        and "</OneX>" in xml_content
+                    ):
+                        xml_content = xml_content.replace(
+                            "</OneX>",
+                            "    <cacheCredentials>true</cacheCredentials>\n    </OneX>",
+                        )
                         xml_file.write_text(xml_content, encoding="utf-8")
             except Exception:
                 pass
@@ -876,7 +1102,7 @@ class CompactWifiApp:
             if name_part in ent_creds:
                 u = ent_creds[name_part]["user"]
                 p = ent_creds[name_part]["pass"]
-                
+
                 # 1. Target Generic for WLEA
                 target = f"Microsoft_Wlea_{name_part}"
                 cmd_cred = f'cmdkey /generic:{target} /user:"{u}" /pass:"{p}"'
@@ -885,20 +1111,33 @@ class CompactWifiApp:
                 # 2. Also target Domain/Server style targets for 802.1X
                 target_domain = f"Microsoft_Wlea_{name_part.lower()}"
                 if target_domain != target:
-                    cmd_cred_dom = f'cmdkey /generic:{target_domain} /user:"{u}" /pass:"{p}"'
-                    subprocess.run(cmd_cred_dom, capture_output=True, text=True, shell=True)
+                    cmd_cred_dom = (
+                        f'cmdkey /generic:{target_domain} /user:"{u}" /pass:"{p}"'
+                    )
+                    subprocess.run(
+                        cmd_cred_dom, capture_output=True, text=True, shell=True
+                    )
 
                 # 3. Force netsh wlan set profileparameter key=userData if applicable
                 try:
                     cmd_param = f'netsh wlan set profileparameter name="{name_part}" key=userData'
-                    subprocess.run(cmd_param, capture_output=True, text=True, shell=True)
+                    subprocess.run(
+                        cmd_param, capture_output=True, text=True, shell=True
+                    )
                 except Exception:
                     pass
 
         total = len(xml_files)
         if already_existed_count == total and not ent_creds:
-            self.lbl_status.config(text=f"STATUS: ALL {total} PROFILES ALREADY EXIST", fg=self.COLOR_INK)
-            CustomToast(self.root, "Thông Báo", f"Toàn bộ {total} cấu hình Wi-Fi đã sẵn có trên máy tính này.", app_icon_path=self.icon_path)
+            self.lbl_status.config(
+                text=f"STATUS: ALL {total} PROFILES ALREADY EXIST", fg=self.COLOR_INK
+            )
+            CustomToast(
+                self.root,
+                "Thông Báo",
+                f"Toàn bộ {total} cấu hình Wi-Fi đã sẵn có trên máy tính này.",
+                app_icon_path=self.icon_path,
+            )
         elif new_restored_count > 0 or ent_creds:
             msg = f"Đã khôi phục thành công các cấu hình Wi-Fi."
             if new_restored_count > 0:
@@ -906,19 +1145,26 @@ class CompactWifiApp:
             if ent_creds:
                 msg += f"\n• Tự động đăng nhập tài khoản: {', '.join(ent_creds.keys())}"
             self.lbl_status.config(text=f"STATUS: RESTORED SUCCESS", fg=self.COLOR_INK)
-            CustomToast(self.root, "Khôi Phục Thành Công", msg, app_icon_path=self.icon_path)
+            CustomToast(
+                self.root, "Khôi Phục Thành Công", msg, app_icon_path=self.icon_path
+            )
         else:
             self.lbl_status.config(text="STATUS: RESTORE FAILED", fg="#EF4444")
-            CustomToast(self.root, "Khôi Phục Thất Bại", "Không thể khôi phục các cấu hình Wi-Fi.", is_error=True, app_icon_path=self.icon_path)
+            CustomToast(
+                self.root,
+                "Khôi Phục Thất Bại",
+                "Không thể khôi phục các cấu hình Wi-Fi.",
+                is_error=True,
+                app_icon_path=self.icon_path,
+            )
 
     def open_backup_dir(self):
         if not BACKUP_DIR.exists():
             BACKUP_DIR.mkdir(parents=True, exist_ok=True)
         os.startfile(BACKUP_DIR)
 
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = CompactWifiApp(root)
     root.mainloop()
-
-

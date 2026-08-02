@@ -67,11 +67,12 @@ WifiRescue/
 
 ---
 
-## Lưu ý về FU-Students (802.1X Enterprise)
+## Lưu ý quan trọng về Wi-Fi Enterprise (FU-Students / FU-Exams)
 
-Wi-Fi trường sử dụng chuẩn **EAP-PEAP (802.1X)** — mật khẩu được Windows mã hóa 1 chiều trong LSA Secrets, không thể trích xuất dạng văn bản thô như Wi-Fi cá nhân.
-
-> **Giải pháp:** WifiRescue yêu cầu bạn nhập tài khoản **1 lần duy nhất** khi Backup. Thông tin này được lưu cục bộ trong `WiFi_Backup/enterprise_credentials.json`. Mọi lần Restore sau đó, tool tự động đăng nhập vào Windows Credential Manager mà không cần nhập lại.
+> [!WARNING]
+> Tính năng **Tự động đăng nhập Wi-Fi Enterprise (FU-Students / FU-Exams)** hiện tại **ĐANG TRONG GIAI ĐOẠN THỬ NGHIỆM (WIP - Work In Progress)**.
+> Do cơ chế mã hóa EAP/DPAPI bảo mật của Windows 10/11 rất nghiêm ngặt, tính năng này **có thể chưa hoạt động tự động 100% trên một số máy tính**.
+> - Nếu bạn **không muốn nhập tài khoản** hoặc chỉ muốn sao lưu các mạng Wi-Fi thông thường: Hãy tích chọn **"⚡ Bỏ qua Wi-Fi Enterprise (Tạm thời test / WIP)"** ngay ngoài màn hình chính trước khi bấm **BACKUP PROFILES**, hoặc bấm nút **Bỏ Qua** trong hộp thoại nhập tài khoản.
 
 ⚠️ **Không chia sẻ** thư mục `WiFi_Backup/` cho người khác vì chứa mật khẩu cá nhân.
 
@@ -80,10 +81,11 @@ Wi-Fi trường sử dụng chuẩn **EAP-PEAP (802.1X)** — mật khẩu đư�
 ## Changelog
 
 ### 🔥 v1.3.0 *(Latest)*
+- **Skip Enterprise Checkbox** — Thêm tích chọn **Bỏ qua Wi-Fi Enterprise (Tạm thời test / WIP)** ngay trên màn hình chính nếu không muốn hiện Popup nhập acc trường
 - **Manage & Remove Wi-Fi Profiles** — Nút bấm mở danh sách tất cả Wi-Fi đã lưu trên Windows để xem và chọn xóa nhanh (Forget) trước khi thi
-- **Enterprise 802.1X Auto-Login Fix** — Tự động vá thẻ XML `<cacheCredentials>true</cacheCredentials>` cho các profile Wi-Fi WPA2 Enterprise (FU-Students/FU-Exams)
+- **Enterprise 802.1X Auto-Login (WIP)** — Tự động vá thẻ XML `<cacheCredentials>true</cacheCredentials>` cho các profile Wi-Fi WPA2 Enterprise (FU-Students/FU-Exams) *(Đang trong giai đoạn thử nghiệm)*
 - **Multi-Target Credential Matching** — Đa dạng hóa Target Credential trong Windows Credential Manager (`Microsoft_Wlea_FU-Students` & `Microsoft_Wlea_fu-students`)
-- **Profile Parameter Injection** — Cập nhật tham số `netsh wlan set profileparameter key=userData` đảm bảo Windows tự động kết nối ngầm không bật Popup đòi tài khoản
+- **Profile Parameter Injection** — Cập nhật tham số `netsh wlan set profileparameter key=userData` đảm bảo Windows tự động kết nối ngầm
 
 ### 🚀 v1.2.0
 - **Impeccable Zinc Dark Theme** — Toàn bộ Dialog & Toast Notification thiết kế lại theo tiêu chuẩn Zinc Dark Mode
