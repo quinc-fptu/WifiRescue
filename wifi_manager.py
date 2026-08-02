@@ -161,7 +161,7 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
         head.pack(fill="x")
         
         tk.Label(head, text=f"🔑 Wi-Fi Trường ({ssid_name})", font=("Segoe UI", 10, "bold"), fg=self.INK, bg=self.BG).pack(anchor="w")
-        tk.Label(head, text="Nhập tài khoản để tự động lưu & khôi phục khi đi thi.", font=("Segoe UI", 8), fg=self.MUTED, bg=self.BG).pack(anchor="w", pady=(2, 0))
+        tk.Label(head, text="Tùy chọn: Nhập tài khoản để tự động lưu & khôi phục (WIP - Có thể chưa hoạt động tùy bản Windows). Bấm Bỏ Qua nếu chỉ muốn sao lưu Wi-Fi thường.", font=("Segoe UI", 7), fg=self.MUTED, bg=self.BG, wraplength=300, justify="left").pack(anchor="w", pady=(2, 0))
 
         tk.Frame(self, bg=self.BORDER, height=1).pack(fill="x", padx=18)
 
