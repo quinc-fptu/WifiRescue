@@ -80,7 +80,10 @@ WifiRescue/
 
 ## Changelog
 
-### 🔥 v1.3.0 *(Latest)*
+### 🔥 v1.3.1 *(Latest)*
+- **Synchronized Profile Deletion** — Tự động đồng bộ xóa các file backup XML (`Wi-Fi-*.xml`) và thông tin đăng nhập trong `enterprise_credentials.json` khi người dùng thực hiện xóa Wi-Fi Profile.
+
+### 🚀 v1.3.0
 - **Skip Enterprise Checkbox** — Thêm tích chọn **Bỏ qua Wi-Fi Enterprise (Tạm thời test / WIP)** ngay trên màn hình chính nếu không muốn hiện Popup nhập acc trường
 - **Manage & Remove Wi-Fi Profiles** — Nút bấm mở danh sách tất cả Wi-Fi đã lưu trên Windows để xem và chọn xóa nhanh (Forget) trước khi thi
 - **Enterprise 802.1X Auto-Login (WIP)** — Tự động vá thẻ XML `<cacheCredentials>true</cacheCredentials>` cho các profile Wi-Fi WPA2 Enterprise (FU-Students/FU-Exams) *(Đang trong giai đoạn thử nghiệm)*

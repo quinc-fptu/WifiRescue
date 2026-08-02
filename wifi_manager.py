@@ -10,7 +10,7 @@ from tkinter import messagebox
 from pathlib import Path
 
 __author__ = "QuiNC"
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 GITHUB_REPO = "quinc-fptu/WifiRescue"
 
 # Application directory configuration
@@ -621,6 +621,35 @@ class ManageProfilesDialog(ImpeccableDialog):
             subprocess.run(
                 f"cmdkey /delete:{target}", capture_output=True, text=True, shell=True
             )
+            
+            # Synchronize with WiFi_Backup directory: remove corresponding XML backup file(s)
+            if BACKUP_DIR.exists():
+                for xml_file in BACKUP_DIR.glob("*.xml"):
+                    # netsh exports profiles as Wi-Fi-{SSID}.xml or {SSID}.xml
+                    stem_name = xml_file.stem
+                    if stem_name.startswith("Wi-Fi-"):
+                        stem_name = stem_name[6:]
+                    if stem_name.strip().lower() == item_text.lower():
+                        try:
+                            xml_file.unlink()
+                        except Exception:
+                            pass
+
+                # Remove from enterprise_credentials.json if exists
+                if CREDENTIALS_FILE.exists():
+                    try:
+                        creds = json.loads(CREDENTIALS_FILE.read_text(encoding="utf-8"))
+                        matching_keys = [k for k in creds if k.lower() == item_text.lower()]
+                        if matching_keys:
+                            for k in matching_keys:
+                                del creds[k]
+                            CREDENTIALS_FILE.write_text(
+                                json.dumps(creds, indent=2, ensure_ascii=False),
+                                encoding="utf-8",
+                            )
+                    except Exception:
+                        pass
+
             self.load_profiles()
         else:
             messagebox.showerror("Lỗi", f"Không thể xóa profile: {res.stderr}")
