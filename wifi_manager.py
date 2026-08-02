@@ -92,7 +92,8 @@ class UpdatePromptDialog(ImpeccableDialog):
 
         msg_text = f"Phiên bản WifiRescue {latest_ver} đã sẵn sàng.\n"
         if release_notes:
-            msg_text += f"\nNội dung cập nhật:\n{release_notes[:150]}"
+            cleaned_notes = release_notes.replace("###", "").replace("**", "").replace("---", "").strip()
+            msg_text += f"\nNội dung cập nhật:\n{cleaned_notes[:180]}"
 
         msg_lbl = tk.Label(
             body,
