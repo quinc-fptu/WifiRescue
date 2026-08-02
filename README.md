@@ -79,12 +79,17 @@ Wi-Fi trường sử dụng chuẩn **EAP-PEAP (802.1X)** — mật khẩu đư�
 
 ## Changelog
 
-### 🚀 v1.2.0 *(Latest)*
+### 🔥 v1.3.0 *(Latest)*
+- **Enterprise 802.1X Auto-Login Fix** — Tự động vá thẻ XML `<cacheCredentials>true</cacheCredentials>` cho các profile Wi-Fi WPA2 Enterprise (FU-Students/FU-Exams)
+- **Multi-Target Credential Matching** — Đa dạng hóa Target Credential trong Windows Credential Manager (`Microsoft_Wlea_FU-Students` & `Microsoft_Wlea_fu-students`)
+- **Profile Parameter Injection** — Cập nhật tham số `netsh wlan set profileparameter key=userData` đảm bảo Windows tự động kết nối ngầm không bật Popup đòi tài khoản
+
+### 🚀 v1.2.0
 - **Impeccable Zinc Dark Theme** — Toàn bộ Dialog & Toast Notification thiết kế lại theo tiêu chuẩn Zinc Dark Mode
 - **Password Eye Toggle (👁)** — Bật/tắt hiển thị mật khẩu trong form nhập tài khoản Enterprise
 - **Deduplicated Enterprise Prompts** — Khử trùng lặp SSID, hiển thị 1 form nhập đại diện duy nhất
 - **Auto-centered Modal & Geometry Fix** — Tự căn giữa cửa sổ, sửa lỗi font float trên Windows/Tkinter
-- **Version & Changelog Viewer** — Nút hiển thị version `v1.2.0` trên Header để xem Changelog nhanh
+- **Version & Changelog Viewer** — Nút hiển thị version `v1.3.0` trên Header để xem Changelog nhanh
 
 ### ⚡ v1.1.0
 - **Enterprise Wi-Fi Auto-Login** — Tự động lưu & nạp lại tài khoản FU-Students (802.1X) qua `cmdkey`

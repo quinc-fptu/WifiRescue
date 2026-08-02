@@ -10,7 +10,7 @@ from tkinter import messagebox
 from pathlib import Path
 
 __author__ = "QuiNC"
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 GITHUB_REPO = "quinc-fptu/WifiRescue"
 
 # Application directory configuration
@@ -27,7 +27,7 @@ CREDENTIALS_FILE = BACKUP_DIR / "enterprise_credentials.json"
 # Windows AppUserModelID for taskbar icon binding
 try:
     import ctypes
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("QuiNC.WifiRescue.App.1.2")
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("QuiNC.WifiRescue.App.1.3")
 except Exception:
     pass
 
@@ -330,7 +330,11 @@ class ChangelogDialog(ImpeccableDialog):
         body.pack(fill="both", expand=True)
 
         changelog_text = (
-            "✨ v1.2.0 (Phiên bản mới nhất):\n"
+            "🔥 v1.3.0 (Phiên bản mới nhất):\n"
+            "• Sửa lỗi tự động đăng nhập FU-Students (WPA2 802.1X).\n"
+            "• Tự động vá thẻ XML <cacheCredentials>true</cacheCredentials>.\n"
+            "• Đa dạng hóa Target Credential & netsh profileparameter.\n\n"
+            "✨ v1.2.0:\n"
             "• Giao diện Modal & Toast Impeccable Zinc Dark Mode.\n"
             "• Thêm nút 👁 hiện/ẩn mật khẩu khi nhập tài khoản.\n"
             "• Khử trùng lặp Popup khi có nhiều Wi-Fi Enterprise.\n"
@@ -704,6 +708,22 @@ class CompactWifiApp:
             if name_part.startswith("Wi-Fi-"):
                 name_part = name_part[6:]
 
+            # Check if this profile is Enterprise (useOneX)
+            is_enterprise = False
+            try:
+                xml_content = xml_file.read_text(encoding="utf-8", errors="ignore")
+                if "<useOneX>true</useOneX>" in xml_content:
+                    is_enterprise = True
+                    # Patch XML to ensure cacheCredentials is set to true if missing
+                    if "<cacheCredentials>false</cacheCredentials>" in xml_content:
+                        xml_content = xml_content.replace("<cacheCredentials>false</cacheCredentials>", "<cacheCredentials>true</cacheCredentials>")
+                        xml_file.write_text(xml_content, encoding="utf-8")
+                    elif "<cacheCredentials>" not in xml_content and "</OneX>" in xml_content:
+                        xml_content = xml_content.replace("</OneX>", "    <cacheCredentials>true</cacheCredentials>\n    </OneX>")
+                        xml_file.write_text(xml_content, encoding="utf-8")
+            except Exception:
+                pass
+
             # Add profile
             if name_part.lower() not in existing_profiles:
                 cmd = f'netsh wlan add profile filename="{xml_file}" user=all'
@@ -715,13 +735,28 @@ class CompactWifiApp:
             else:
                 already_existed_count += 1
 
-            # Inject Enterprise Credentials via cmdkey if present
+            # Inject Enterprise Credentials via both cmdkey AND netsh profileparameter if present
             if name_part in ent_creds:
                 u = ent_creds[name_part]["user"]
                 p = ent_creds[name_part]["pass"]
+                
+                # 1. Target Generic for WLEA
                 target = f"Microsoft_Wlea_{name_part}"
                 cmd_cred = f'cmdkey /generic:{target} /user:"{u}" /pass:"{p}"'
                 subprocess.run(cmd_cred, capture_output=True, text=True, shell=True)
+
+                # 2. Also target Domain/Server style targets for 802.1X
+                target_domain = f"Microsoft_Wlea_{name_part.lower()}"
+                if target_domain != target:
+                    cmd_cred_dom = f'cmdkey /generic:{target_domain} /user:"{u}" /pass:"{p}"'
+                    subprocess.run(cmd_cred_dom, capture_output=True, text=True, shell=True)
+
+                # 3. Force netsh wlan set profileparameter key=userData if applicable
+                try:
+                    cmd_param = f'netsh wlan set profileparameter name="{name_part}" key=userData'
+                    subprocess.run(cmd_param, capture_output=True, text=True, shell=True)
+                except Exception:
+                    pass
 
         total = len(xml_files)
         if already_existed_count == total and not ent_creds:
