@@ -1150,7 +1150,7 @@ class CompactWifiApp:
             if new_restored_count > 0:
                 msg += f"\n• Nạp thêm: {new_restored_count} Wi-Fi mới."
             if skip_ent:
-                msg += "\n• ⚡ Đã bỏ qua nạp tài khoản Wi-Fi Enterprise (WIP)."
+                msg += "\n• Đã bỏ qua nạp tài khoản Wi-Fi Enterprise (WIP)."
             elif ent_creds:
                 msg += f"\n• Tự động đăng nhập tài khoản: {', '.join(ent_creds.keys())}"
             self.lbl_status.config(text=f"STATUS: RESTORED SUCCESS", fg=self.COLOR_INK)
