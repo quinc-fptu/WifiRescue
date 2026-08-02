@@ -198,21 +198,21 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
         tk.Label(
             head,
             text=f"🔑 Wi-Fi Trường ({ssid_name})",
-            font=("Segoe UI", 10, "bold"),
+            font=("Segoe UI", 11, "bold"),
             fg=self.INK,
             bg=self.BG,
         ).pack(anchor="w")
         tk.Label(
             head,
             text="Tùy chọn: Nhập tài khoản để tự động lưu & khôi phục (WIP - Có thể chưa hoạt động tùy bản Windows). Bấm Bỏ Qua nếu chỉ muốn sao lưu Wi-Fi thường.",
-            font=("Segoe UI", 7),
+            font=("Segoe UI", 9),
             fg=self.MUTED,
             bg=self.BG,
-            wraplength=300,
+            wraplength=380,
             justify="left",
-        ).pack(anchor="w", pady=(2, 0))
+        ).pack(anchor="w", pady=(4, 0))
 
-        tk.Frame(self, bg=self.BORDER, height=1).pack(fill="x", padx=18)
+        tk.Frame(self, bg=self.BORDER, height=1).pack(fill="x", padx=18, pady=(8, 0))
 
         # Body Form
         body = tk.Frame(self, bg=self.BG, padx=18, pady=10)
@@ -222,7 +222,7 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
         tk.Label(
             body,
             text="USERNAME / MSSV",
-            font=("Segoe UI", 8, "bold"),
+            font=("Segoe UI", 9, "bold"),
             fg="#71717A",
             bg=self.BG,
         ).pack(anchor="w")
@@ -230,18 +230,18 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
         u_frame = tk.Frame(
             body, bg=self.SURFACE, highlightbackground=self.BORDER, highlightthickness=1
         )
-        u_frame.pack(fill="x", pady=(3, 8))
+        u_frame.pack(fill="x", pady=(4, 10))
 
         self.ent_user = tk.Entry(
             u_frame,
-            font=("Segoe UI", 9),
+            font=("Segoe UI", 10),
             bg=self.SURFACE,
             fg=self.INK,
             insertbackground=self.INK,
             bd=0,
             relief="flat",
         )
-        self.ent_user.pack(fill="x", padx=8, pady=5)
+        self.ent_user.pack(fill="x", padx=8, pady=6)
         if default_user:
             self.ent_user.insert(0, default_user)
         else:
@@ -251,7 +251,7 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
         tk.Label(
             body,
             text="PASSWORD / MẬT KHẨU",
-            font=("Segoe UI", 8, "bold"),
+            font=("Segoe UI", 9, "bold"),
             fg="#71717A",
             bg=self.BG,
         ).pack(anchor="w")
@@ -259,11 +259,11 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
         p_frame = tk.Frame(
             body, bg=self.SURFACE, highlightbackground=self.BORDER, highlightthickness=1
         )
-        p_frame.pack(fill="x", pady=(3, 6))
+        p_frame.pack(fill="x", pady=(4, 8))
 
         self.ent_pass = tk.Entry(
             p_frame,
-            font=("Segoe UI", 9),
+            font=("Segoe UI", 10),
             bg=self.SURFACE,
             fg=self.INK,
             insertbackground=self.INK,
@@ -271,13 +271,13 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
             relief="flat",
             show="•",
         )
-        self.ent_pass.pack(side="left", fill="x", expand=True, padx=(8, 4), pady=5)
+        self.ent_pass.pack(side="left", fill="x", expand=True, padx=(8, 4), pady=6)
 
         self.show_pwd = False
         self.btn_toggle = tk.Label(
             p_frame,
             text="👁",
-            font=("Segoe UI", 9),
+            font=("Segoe UI", 10),
             fg="#71717A",
             bg=self.SURFACE,
             cursor="hand2",
@@ -286,13 +286,13 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
         self.btn_toggle.bind("<Button-1>", self.toggle_password_visibility)
 
         # Action Buttons
-        btn_box = tk.Frame(self, bg=self.BG, padx=18, pady=10)
+        btn_box = tk.Frame(self, bg=self.BG, padx=18, pady=12)
         btn_box.pack(fill="x", side="bottom")
 
         btn_save = tk.Button(
             btn_box,
             text="Lưu Tài Khoản",
-            font=("Segoe UI", 8, "bold"),
+            font=("Segoe UI", 9, "bold"),
             bg=self.INK,
             fg=self.BG,
             activebackground="#E4E4E7",
@@ -300,8 +300,8 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
             relief="flat",
             bd=0,
             cursor="hand2",
-            padx=12,
-            pady=5,
+            padx=14,
+            pady=6,
             command=self.on_save,
         )
         btn_save.pack(side="right", padx=(6, 0))
@@ -309,7 +309,7 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
         btn_skip = tk.Button(
             btn_box,
             text="Bỏ Qua",
-            font=("Segoe UI", 8),
+            font=("Segoe UI", 9),
             bg=self.SURFACE,
             fg=self.MUTED,
             activebackground=self.BORDER,
@@ -317,13 +317,13 @@ class EnterpriseCredentialDialog(ImpeccableDialog):
             relief="flat",
             bd=0,
             cursor="hand2",
-            padx=12,
-            pady=5,
+            padx=14,
+            pady=6,
             command=self.destroy,
         )
         btn_skip.pack(side="right")
 
-        self.center_modal(340, 240)
+        self.center_modal(420, 330)
 
     def toggle_password_visibility(self, event=None):
         self.show_pwd = not self.show_pwd
