@@ -80,6 +80,7 @@ Wi-Fi trường sử dụng chuẩn **EAP-PEAP (802.1X)** — mật khẩu đư�
 ## Changelog
 
 ### 🔥 v1.3.0 *(Latest)*
+- **Manage & Remove Wi-Fi Profiles** — Nút bấm mở danh sách tất cả Wi-Fi đã lưu trên Windows để xem và chọn xóa nhanh (Forget) trước khi thi
 - **Enterprise 802.1X Auto-Login Fix** — Tự động vá thẻ XML `<cacheCredentials>true</cacheCredentials>` cho các profile Wi-Fi WPA2 Enterprise (FU-Students/FU-Exams)
 - **Multi-Target Credential Matching** — Đa dạng hóa Target Credential trong Windows Credential Manager (`Microsoft_Wlea_FU-Students` & `Microsoft_Wlea_fu-students`)
 - **Profile Parameter Injection** — Cập nhật tham số `netsh wlan set profileparameter key=userData` đảm bảo Windows tự động kết nối ngầm không bật Popup đòi tài khoản

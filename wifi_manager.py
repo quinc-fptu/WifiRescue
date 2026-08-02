@@ -331,6 +331,7 @@ class ChangelogDialog(ImpeccableDialog):
 
         changelog_text = (
             "🔥 v1.3.0 (Phiên bản mới nhất):\n"
+            "• Thêm nút '⚙ Quản Lý / Xóa Wi-Fi Đã Lưu' trên Windows.\n"
             "• Sửa lỗi tự động đăng nhập FU-Students (WPA2 802.1X).\n"
             "• Tự động vá thẻ XML <cacheCredentials>true</cacheCredentials>.\n"
             "• Đa dạng hóa Target Credential & netsh profileparameter.\n\n"
@@ -377,7 +378,123 @@ class ChangelogDialog(ImpeccableDialog):
         )
         btn_close.pack(fill="x")
 
-        self.center_modal(360, 320)
+        self.center_modal(360, 360)
+
+
+class ManageProfilesDialog(ImpeccableDialog):
+    """Dialog for listing all saved Windows Wi-Fi profiles and selectively deleting/forgetting them."""
+    def __init__(self, parent, app_icon_path=None):
+        super().__init__(parent, "Quản Lý Wi-Fi Đã Lưu", app_icon_path)
+
+        # Header
+        head = tk.Frame(self, bg=self.BG, padx=18, pady=12)
+        head.pack(fill="x")
+
+        tk.Label(head, text="📶 DANH SÁCH WI-FI ĐÃ LƯU TRÊN MÁY", font=("Segoe UI", 10, "bold"), fg=self.INK, bg=self.BG).pack(anchor="w")
+        tk.Label(head, text="Chọn mạng Wi-Fi và bấm Xóa để Forget profile khỏi Windows.", font=("Segoe UI", 8), fg=self.MUTED, bg=self.BG).pack(anchor="w", pady=(2, 0))
+
+        tk.Frame(self, bg=self.BORDER, height=1).pack(fill="x", padx=18)
+
+        # Listbox Frame
+        body = tk.Frame(self, bg=self.BG, padx=18, pady=10)
+        body.pack(fill="both", expand=True)
+
+        list_frame = tk.Frame(body, bg=self.SURFACE, highlightbackground=self.BORDER, highlightthickness=1)
+        list_frame.pack(fill="both", expand=True)
+
+        scrollbar = tk.Scrollbar(list_frame, orient="vertical")
+        scrollbar.pack(side="right", fill="y")
+
+        self.listbox = tk.Listbox(
+            list_frame,
+            font=("Segoe UI", 9),
+            bg=self.SURFACE,
+            fg=self.INK,
+            selectbackground="#27272A",
+            selectforeground="#10B981",
+            bd=0,
+            relief="flat",
+            highlightthickness=0,
+            yscrollcommand=scrollbar.set
+        )
+        self.listbox.pack(fill="both", expand=True, padx=4, pady=4)
+        scrollbar.config(command=self.listbox.yview)
+
+        # Bottom Buttons
+        btn_box = tk.Frame(self, bg=self.BG, padx=18, pady=10)
+        btn_box.pack(fill="x", side="bottom")
+
+        btn_delete = tk.Button(
+            btn_box,
+            text="🗑 Xóa Mạng Đã Chọn",
+            font=("Segoe UI", 8, "bold"),
+            bg="#EF4444",
+            fg="#FFFFFF",
+            activebackground="#DC2626",
+            activeforeground="#FFFFFF",
+            relief="flat",
+            bd=0,
+            cursor="hand2",
+            padx=12,
+            pady=5,
+            command=self.delete_selected
+        )
+        btn_delete.pack(side="right", padx=(6, 0))
+
+        btn_close = tk.Button(
+            btn_box,
+            text="Đóng",
+            font=("Segoe UI", 8),
+            bg=self.SURFACE,
+            fg=self.MUTED,
+            activebackground=self.BORDER,
+            activeforeground=self.INK,
+            relief="flat",
+            bd=0,
+            cursor="hand2",
+            padx=12,
+            pady=5,
+            command=self.destroy
+        )
+        btn_close.pack(side="right")
+
+        self.load_profiles()
+        self.center_modal(380, 340)
+
+    def load_profiles(self):
+        self.listbox.delete(0, tk.END)
+        try:
+            res = subprocess.run('netsh wlan show profiles', capture_output=True, text=True, shell=True, encoding='utf-8', errors='ignore')
+            profiles = []
+            for line in res.stdout.splitlines():
+                if ":" in line:
+                    p_name = line.split(":", 1)[1].strip()
+                    if p_name and p_name != "<None>":
+                        profiles.append(p_name)
+            for p in sorted(profiles):
+                self.listbox.insert(tk.END, f"  {p}")
+            if not profiles:
+                self.listbox.insert(tk.END, " (Không có Wi-Fi nào đã lưu)")
+        except Exception as e:
+            self.listbox.insert(tk.END, f" Lỗi: {e}")
+
+    def delete_selected(self):
+        sel = self.listbox.curselection()
+        if not sel:
+            return
+        item_text = self.listbox.get(sel[0]).strip()
+        if item_text.startswith("(") or item_text.startswith("Lỗi"):
+            return
+
+        cmd = f'netsh wlan delete profile name="{item_text}"'
+        res = subprocess.run(cmd, capture_output=True, text=True, shell=True)
+        if res.returncode == 0:
+            # Also clean up WLEA credential if present
+            target = f"Microsoft_Wlea_{item_text}"
+            subprocess.run(f'cmdkey /delete:{target}', capture_output=True, text=True, shell=True)
+            self.load_profiles()
+        else:
+            messagebox.showerror("Lỗi", f"Không thể xóa profile: {res.stderr}")
 
 class CompactWifiApp:
     def __init__(self, root):
@@ -528,7 +645,23 @@ class CompactWifiApp:
             pady=8,
             command=self.restore_wifi
         )
-        self.btn_restore.pack(fill="x")
+        self.btn_restore.pack(fill="x", pady=(0, 8))
+
+        self.btn_manage = tk.Button(
+            content,
+            text="⚙ QUẢN LÝ / XÓA WI-FI ĐÃ LƯU",
+            font=("Segoe UI", 8, "bold"),
+            bg=self.COLOR_SURFACE,
+            fg=self.COLOR_MUTED,
+            activebackground=self.COLOR_BORDER,
+            activeforeground=self.COLOR_INK,
+            relief="flat",
+            bd=0,
+            cursor="hand2",
+            pady=6,
+            command=self.show_manage_popup
+        )
+        self.btn_manage.pack(fill="x")
 
         # Footer Status Bar
         footer = tk.Frame(self.root, bg=self.COLOR_BG, padx=16, pady=8)
@@ -556,6 +689,9 @@ class CompactWifiApp:
 
     def show_changelog_popup(self):
         ChangelogDialog(self.root, self.icon_path)
+
+    def show_manage_popup(self):
+        ManageProfilesDialog(self.root, self.icon_path)
 
     def show_help_popup(self):
         popup = ImpeccableDialog(self.root, "Hướng Dẫn Sử Dụng - WifiRescue", self.icon_path)
