@@ -12,7 +12,7 @@ Không bao giờ phải cấu hình lại mạng sau mỗi buổi thi PE/FE nữ
 [![Windows](https://img.shields.io/badge/Platform-Windows-blue?style=flat-square&color=18181b&labelColor=09090b)](https://github.com/quinc-fptu/WifiRescue)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square&color=18181b&labelColor=09090b)](https://github.com/quinc-fptu/WifiRescue/blob/main/LICENSE)
 
-[**⬇ Tải ngay**](https://github.com/quinc-fptu/WifiRescue/releases/latest) · [**📄 Trang hướng dẫn**](https://quinc-fptu.github.io/WifiRescue/) · [**🐛 Báo lỗi**](https://github.com/quinc-fptu/WifiRescue/issues)
+[**⬇ Tải ngay**](https://github.com/quinc-fptu/WifiRescue/releases/latest) · [**📄 Trang hướng dẫn**](https://quinc-dev.github.io/WifiRescue/) · [**🐛 Báo lỗi**](https://github.com/quinc-fptu/WifiRescue/issues)
 
 </div>
 

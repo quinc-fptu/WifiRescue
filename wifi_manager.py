@@ -75,7 +75,7 @@ class ImpeccableDialog(tk.Toplevel):
         self.grab_set()
 
 
-GITHUB_PAGES_URL = "https://quinc-fptu.github.io/WifiRescue/"
+GITHUB_PAGES_URL = "https://quinc-dev.github.io/WifiRescue/"
 
 
 class UpdatePromptDialog(ImpeccableDialog):
