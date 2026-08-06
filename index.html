@@ -3,185 +3,208 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WifiRescue by QuiNC</title>
-  <meta name="description" content="Công cụ portable nhẹ gọn sao lưu và khôi phục toàn bộ mật khẩu Wi-Fi cho sinh viên FPTU.">
+  <title>WifiRescue — FPTU Wi-Fi Backup Utility</title>
+  <meta name="description" content="Công cụ 1-click sao lưu & khôi phục mật khẩu Wi-Fi cho sinh viên FPTU khi đi thi PE/FE.">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="shortcut icon" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #09090b;
+      --card-bg: #121215;
+      --border: #27272a;
+      --border-highlight: #3f3f46;
+      --text-main: #fafafa;
+      --text-muted: #a1a1aa;
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.15);
+      --orange: #f97316;
+      --orange-bg: rgba(249, 115, 22, 0.08);
+      --orange-border: rgba(249, 115, 22, 0.22);
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
      
     body {
-      background-color: #09090b;
-      color: #fafafa;
+      background-color: var(--bg);
+      color: var(--text-main);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      padding: 24px 16px;
+      padding: 16px;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
-    .app-card {
-      background: #18181b;
-      border: 1px solid #27272a;
-      border-radius: 18px;
-      padding: 32px 36px;
-      max-width: 580px;
+    .hud-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 28px;
+      max-width: 520px;
       width: 100%;
-      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.03);
+      position: relative;
     }
 
-    /* App Header Bar */
-    .app-header {
+    /* Top Brand Header */
+    .brand-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid #27272a;
+      margin-bottom: 14px;
     }
 
-    .brand-group {
+    .brand-left {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
-    .app-icon {
-      width: 42px;
-      height: 42px;
-      background: #27272a;
+    .icon-badge {
+      width: 38px;
+      height: 38px;
+      background: #18181b;
+      border: 1px solid var(--border);
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #fafafa;
-      flex-shrink: 0;
+      color: var(--emerald);
+      box-shadow: 0 0 12px var(--emerald-glow);
     }
 
     .app-title {
-      font-size: 19px;
-      font-weight: 700;
+      font-size: 18px;
+      font-weight: 800;
       letter-spacing: -0.02em;
       color: #ffffff;
-      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .app-title .ver {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--emerald);
+      background: var(--emerald-glow);
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
     }
 
     .app-author {
-      font-size: 12px;
+      font-size: 11.5px;
       color: #71717a;
       font-weight: 500;
-      margin-top: 2px;
     }
 
     .app-author a {
-      color: #fafafa;
+      color: var(--text-muted);
       text-decoration: none;
       font-weight: 600;
     }
-    .app-author a:hover { text-decoration: underline; }
+    .app-author a:hover { color: #ffffff; }
 
-    .tag-fptu {
-      font-size: 11px;
+    .tag-exam {
+      font-size: 10.5px;
       font-weight: 700;
-      padding: 4px 10px;
+      padding: 3px 8px;
       border-radius: 6px;
-      background: rgba(249, 115, 22, 0.12);
+      background: var(--orange-bg);
       color: #fb923c;
-      border: 1px solid rgba(249, 115, 22, 0.25);
-      white-space: nowrap;
-      flex-shrink: 0;
+      border: 1px solid var(--orange-border);
     }
 
-    /* Description */
-    .intro-box {
-      font-size: 13.5px;
-      line-height: 1.55;
-      color: #a1a1aa;
-      margin-bottom: 22px;
+    /* Compact Intro Banner */
+    .banner-update {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: #d4d4d8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      line-height: 1.35;
     }
-    .intro-box strong { color: #fafafa; }
 
-    /* Code Highlight pill */
+    .banner-update strong { color: var(--emerald); }
+
+    /* Compact 3-Step Flow Grid */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .step-card {
+      background: #09090b;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .step-num {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--emerald);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .step-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .step-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
     code {
       font-family: inherit;
       background: #27272a;
-      color: #fafafa;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 12px;
-      white-space: nowrap;
+      color: #ffffff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 10.5px;
     }
 
-    /* Steps Flow */
-    .flow-container {
+    /* Enterprise Callout */
+    .callout-box {
+      background: var(--orange-bg);
+      border: 1px solid var(--orange-border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 11.5px;
+      color: #d4d4d8;
+      line-height: 1.35;
+      margin-bottom: 16px;
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-
-    .flow-step {
-      display: flex;
+      gap: 8px;
       align-items: flex-start;
-      gap: 12px;
-      background: #09090b;
-      border: 1px solid #27272a;
-      border-radius: 10px;
-      padding: 14px 16px;
     }
+    .callout-box strong { color: #fb923c; }
 
-    .flow-icon {
-      color: #fafafa;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .flow-content {
-      font-size: 13px;
-      color: #a1a1aa;
-      line-height: 1.5;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 6px;
-      width: 100%;
-    }
-    .flow-content strong {
-      color: #fafafa;
-      font-weight: 600;
-      font-size: 13.5px;
-      flex-shrink: 0;
-    }
-    .flow-content em {
-      color: #fafafa;
-      font-style: normal;
-      font-weight: 600;
-    }
-
-    @media (max-width: 480px) {
-      .app-card {
-        padding: 24px 20px;
-        border-radius: 14px;
-      }
-      .app-header {
-        align-items: flex-start;
-      }
-      .flow-content {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-      }
-    }
-
-    /* CTA Section */
-    .cta-group {
-      display: flex;
-      flex-direction: column;
+    /* Action Buttons */
+    .cta-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
       gap: 10px;
     }
 
@@ -189,134 +212,110 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      background: #fafafa;
+      gap: 6px;
+      background: var(--text-main);
       color: #09090b;
-      padding: 12px;
+      padding: 10px 14px;
       border-radius: 8px;
-      font-weight: 600;
-      font-size: 14px;
+      font-weight: 700;
+      font-size: 13px;
       text-decoration: none;
-      transition: background 0.15s ease;
+      transition: background 0.15s ease, transform 0.1s ease;
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
     }
     .btn-download:hover { background: #e4e4e7; }
+    .btn-download:active { transform: scale(0.98); }
 
     .btn-repo {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      background: #09090b;
-      color: #fafafa;
-      border: 1px solid #27272a;
-      padding: 11px;
+      gap: 6px;
+      background: #18181b;
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 10px;
       border-radius: 8px;
-      font-weight: 500;
+      font-weight: 600;
       text-decoration: none;
-      font-size: 13px;
+      font-size: 12.5px;
       transition: border-color 0.15s ease, background 0.15s ease;
     }
     .btn-repo:hover {
-      border-color: #3f3f46;
-      background: #121215;
+      border-color: var(--border-highlight);
+      background: #27272a;
+    }
+
+    @media (max-width: 480px) {
+      .hud-card { padding: 18px 16px; }
+      .steps-grid { grid-template-columns: 1fr; gap: 6px; }
+      .cta-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <div class="app-card">
+  <div class="hud-card">
     
     <!-- Top Header -->
-    <div class="app-header">
-      <div class="brand-group">
-        <div class="app-icon">
+    <div class="brand-header">
+      <div class="brand-left">
+        <div class="icon-badge">
           <!-- Lucide Wifi -->
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.85a10 10 0 0 1 14 0"/><path d="M8.5 16.88a5 5 0 0 1 7 0"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"/><path d="M2 8.82a15 15 0 0 1 20 0"/><path d="M5 12.85a10 10 0 0 1 14 0"/><path d="M8.5 16.88a5 5 0 0 1 7 0"/></svg>
         </div>
         <div>
-          <div class="app-title">WifiRescue</div>
-          <div class="app-author">by <a href="https://github.com/quinc-fptu" target="_blank">QuiNC</a></div>
+          <div class="app-title">
+            WifiRescue
+            <span class="ver">v1.3.1</span>
+          </div>
+          <div class="app-author">by <a href="https://github.com/quinc-dev" target="_blank">QuiNC</a></div>
         </div>
       </div>
-      <span class="tag-fptu">FPTU EXAM</span>
+      <span class="tag-exam">FPTU EXAM</span>
     </div>
 
-    <!-- Announcement Banner -->
-    <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
-      <div style="color: #10b981; flex-shrink: 0;">
-        <!-- Lucide Sparkles -->
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+    <!-- Announcement -->
+    <div class="banner-update">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--emerald); flex-shrink: 0;"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+      <div><strong>V1.3.1:</strong> Quản lý trực tiếp file sao lưu local & đồng bộ xóa XML / acc tự động.</div>
+    </div>
+
+    <!-- 3-Step Flow Grid (Horizontal compact) -->
+    <div class="steps-grid">
+      <div class="step-card">
+        <span class="step-num">BƯỚC 1</span>
+        <div class="step-title">Giải nén</div>
+        <div class="step-desc">Giải nén <code>.zip</code> trước khi dùng.</div>
       </div>
-      <div style="font-size: 12px; color: #e4e4e7; line-height: 1.4;">
-        <strong style="color: #10b981;">THÔNG BÁO NÂNG CẤP V1.3.1:</strong> Tự động đồng bộ hóa xóa file backup XML & thông tin đăng nhập khi xóa Wi-Fi Profile! Bấm <strong>Tải WifiRescue.zip v1.3.1</strong> bên dưới để nâng cấp.
+      <div class="step-card">
+        <span class="step-num">BƯỚC 2</span>
+        <div class="step-title">Trước thi</div>
+        <div class="step-desc">Bấm <strong>BACKUP</strong> để lưu lại Wi-Fi.</div>
+      </div>
+      <div class="step-card">
+        <span class="step-num">BƯỚC 3</span>
+        <div class="step-title">Sau thi</div>
+        <div class="step-desc">Bấm <strong>RESTORE</strong> nạp lại 100%.</div>
       </div>
     </div>
 
-    <!-- Description -->
-    <div class="intro-box">
-      Công cụ <strong>1-click portable (v1.3.1)</strong> cứu cánh sinh viên FPTU khi đi thi PE/FE bị bắt Forget Wi-Fi. Tự động lưu & khôi phục toàn bộ mật khẩu và tài khoản Wi-Fi <strong>FU-Students</strong> chỉ trong 1 giây với giao diện Impeccable Zinc Dark Theme mới!
+    <!-- Enterprise Note -->
+    <div class="callout-box">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #fb923c; flex-shrink: 0; margin-top: 1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <div><strong>FU-Students (802.1X):</strong> Tự động lưu & nạp lại tài khoản đăng nhập mà không cần nhập lại mật khẩu mỗi đợt thi!</div>
     </div>
 
-    <!-- Steps Flow -->
-    <div class="flow-container">
-      
-      <div class="flow-step">
-        <div class="flow-icon">
-          <!-- Lucide FolderArchive -->
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="19" r="2"/><path d="M4 8V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"/><path d="M4 8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4"/><path d="M20 8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-4"/><polyline points="10 12 12 10 14 12"/><line x1="12" x2="12" y1="10" y2="17"/></svg>
-        </div>
-        <div class="flow-content">
-          <strong>1. Tải & Giải nén:</strong>
-          <span>Giải nén <code>WifiRescue.zip</code> trước khi mở app.</span>
-        </div>
-      </div>
-
-      <div class="flow-step">
-        <div class="flow-icon">
-          <!-- Lucide Save -->
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        </div>
-        <div class="flow-content">
-          <strong>2. Trước khi thi:</strong>
-          <span>Mở <code>WifiRescue.exe</code> ➔ Bấm <em>BACKUP PROFILES</em> (Nhập acc FU-Students 1 lần duy nhất).</span>
-        </div>
-      </div>
-
-      <div class="flow-step">
-        <div class="flow-icon">
-          <!-- Lucide RotateCcw -->
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-        </div>
-        <div class="flow-content">
-          <strong>3. Sau khi thi:</strong>
-          <span>Mở <code>WifiRescue.exe</code> ➔ Bấm <em>RESTORE PROFILES</em> (Wi-Fi + Acc tự nạp 100%).</span>
-        </div>
-      </div>
-
-      <div class="flow-step" style="border-color: rgba(249, 115, 22, 0.25); background: rgba(249, 115, 22, 0.05);">
-        <div class="flow-icon" style="color: #fb923c;">
-          <!-- Lucide Info -->
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-        </div>
-        <div class="flow-content" style="color: #d4d4d8; font-size: 12px;">
-          <strong style="color: #fb923c;">Lưu ý về Wi-Fi FU-Students:</strong> Do chuẩn 802.1X mã hóa bảo mật của Windows, bạn chỉ cần nhập tài khoản 1 lần khi Backup. WifiRescue sẽ tự lưu và tự nạp đăng nhập không cần gõ lại ở các lần sau!
-        </div>
-      </div>
-
-    </div>
-
-    <!-- CTA -->
-    <div class="cta-group">
+    <!-- Action Bar -->
+    <div class="cta-row">
       <a href="https://github.com/quinc-fptu/WifiRescue/releases/download/v1.3.1/WifiRescue.zip" class="btn-download">
-        <!-- Lucide Download -->
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-        Tải WifiRescue.zip (v1.3.1)
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+        Tải WifiRescue.zip
       </a>
 
-      <a href="https://github.com/quinc-fptu/WifiRescue" target="_blank" class="btn-repo">
-        <!-- Lucide Github -->
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-        GitHub Repository
+      <a href="https://github.com/quinc-dev/WifiRescue" target="_blank" class="btn-repo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+        GitHub Repo
       </a>
     </div>
 
