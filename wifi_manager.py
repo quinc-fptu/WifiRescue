@@ -125,7 +125,7 @@ class UpdatePromptDialog(ImpeccableDialog):
                 .replace("---", "")
                 .strip()
             )
-            msg_text += f"\nNội dung cập nhật:\n{cleaned_notes[:180]}"
+            msg_text += f"\nNội dung cập nhật:\n{cleaned_notes[:250]}"
 
         msg_lbl = tk.Label(
             body,
@@ -134,7 +134,7 @@ class UpdatePromptDialog(ImpeccableDialog):
             fg="#D4D4D8",
             bg=self.BG,
             justify="left",
-            wraplength=310,
+            wraplength=340,
             anchor="nw",
         )
         msg_lbl.pack(fill="both", expand=True)
