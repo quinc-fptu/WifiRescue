@@ -961,8 +961,6 @@ class CompactWifiApp:
             result = subprocess.run(cmd, capture_output=True, text=True, shell=True)
 
             if result.returncode == 0:
-                count = len(list(BACKUP_DIR.glob("*.xml")))
-
                 # Check for Enterprise SSIDs (like FU-Students, FU-Exams)
                 ent_creds = {}
                 if CREDENTIALS_FILE.exists():
@@ -986,8 +984,16 @@ class CompactWifiApp:
                     except Exception:
                         pass
 
-                # Prompt for each unique enterprise SSID sequentially (unless skipped via checkbox)
-                if not self.skip_enterprise_var.get():
+                # If skip_enterprise is checked, delete enterprise XML files from backup
+                if self.skip_enterprise_var.get():
+                    for xml_file in list(BACKUP_DIR.glob("*.xml")):
+                        try:
+                            content = xml_file.read_text(encoding="utf-8", errors="ignore")
+                            if "<useOneX>true</useOneX>" in content:
+                                xml_file.unlink(missing_ok=True)
+                        except Exception:
+                            pass
+                else:
                     for ssid in sorted(ent_ssids):
                         def_u = ent_creds.get(ssid, {}).get("user", "")
                         dlg = EnterpriseCredentialDialog(
@@ -1003,6 +1009,9 @@ class CompactWifiApp:
                         CREDENTIALS_FILE.write_text(
                             json.dumps(ent_creds, indent=2), encoding="utf-8"
                         )
+
+                # Calculate final count after filtering enterprise XML files
+                count = len(list(BACKUP_DIR.glob("*.xml")))
 
                 self.lbl_status.config(
                     text=f"STATUS: BACKED UP {count} PROFILES", fg=self.COLOR_INK
