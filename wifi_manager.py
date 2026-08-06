@@ -834,7 +834,7 @@ class CompactWifiApp:
         self.btn_manage.pack(fill="x", pady=(0, 8))
 
         # Checkbox Option to Skip Enterprise Prompt (WIP)
-        self.skip_enterprise_var = tk.BooleanVar(value=False)
+        self.skip_enterprise_var = tk.BooleanVar(value=True)
         self.chk_skip_ent = tk.Checkbutton(
             content,
             text="Bỏ qua Wi-Fi Enterprise (Tạm thời test / WIP)",
