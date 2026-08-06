@@ -487,10 +487,10 @@ class ChangelogDialog(ImpeccableDialog):
 
 
 class ManageProfilesDialog(ImpeccableDialog):
-    """Dialog for listing all saved Windows Wi-Fi profiles and selectively deleting/forgetting them."""
+    """Dialog for listing saved backup Wi-Fi profiles and selectively deleting backup files."""
 
     def __init__(self, parent, app_icon_path=None):
-        super().__init__(parent, "Quản Lý Wi-Fi Đã Lưu", app_icon_path)
+        super().__init__(parent, "Quản Lý Bản Sao Lưu Wi-Fi", app_icon_path)
 
         # Header
         head = tk.Frame(self, bg=self.BG, padx=18, pady=12)
@@ -498,14 +498,14 @@ class ManageProfilesDialog(ImpeccableDialog):
 
         tk.Label(
             head,
-            text="📶 DANH SÁCH WI-FI ĐÃ LƯU TRÊN MÁY",
+            text="📶 DANH SÁCH WI-FI TRONG BỘ SAO LƯU",
             font=("Segoe UI", 10, "bold"),
             fg=self.INK,
             bg=self.BG,
         ).pack(anchor="w")
         tk.Label(
             head,
-            text="Chọn mạng Wi-Fi và bấm Xóa để Forget profile khỏi Windows.",
+            text="Chọn Wi-Fi và bấm Xóa để xóa khỏi thư mục sao lưu (WiFi_Backup).",
             font=("Segoe UI", 8),
             fg=self.MUTED,
             bg=self.BG,
@@ -546,7 +546,7 @@ class ManageProfilesDialog(ImpeccableDialog):
 
         btn_delete = tk.Button(
             btn_box,
-            text="🗑 Xóa Mạng Đã Chọn",
+            text="🗑 Xóa Bản Sao Lưu",
             font=("Segoe UI", 8, "bold"),
             bg="#EF4444",
             fg="#FFFFFF",
@@ -584,24 +584,18 @@ class ManageProfilesDialog(ImpeccableDialog):
     def load_profiles(self):
         self.listbox.delete(0, tk.END)
         try:
-            res = subprocess.run(
-                "netsh wlan show profiles",
-                capture_output=True,
-                text=True,
-                shell=True,
-                encoding="utf-8",
-                errors="ignore",
-            )
             profiles = []
-            for line in res.stdout.splitlines():
-                if ":" in line:
-                    p_name = line.split(":", 1)[1].strip()
-                    if p_name and p_name != "<None>":
-                        profiles.append(p_name)
+            if BACKUP_DIR.exists():
+                for xml_file in BACKUP_DIR.glob("*.xml"):
+                    stem_name = xml_file.stem
+                    if stem_name.startswith("Wi-Fi-"):
+                        stem_name = stem_name[6:]
+                    profiles.append(stem_name)
+
             for p in sorted(profiles):
                 self.listbox.insert(tk.END, f"  {p}")
             if not profiles:
-                self.listbox.insert(tk.END, " (Không có Wi-Fi nào đã lưu)")
+                self.listbox.insert(tk.END, " (Chưa có bản sao lưu nào)")
         except Exception as e:
             self.listbox.insert(tk.END, f" Lỗi: {e}")
 
@@ -613,46 +607,33 @@ class ManageProfilesDialog(ImpeccableDialog):
         if item_text.startswith("(") or item_text.startswith("Lỗi"):
             return
 
-        cmd = f'netsh wlan delete profile name="{item_text}"'
-        res = subprocess.run(cmd, capture_output=True, text=True, shell=True)
-        if res.returncode == 0:
-            # Also clean up WLEA credential if present
-            target = f"Microsoft_Wlea_{item_text}"
-            subprocess.run(
-                f"cmdkey /delete:{target}", capture_output=True, text=True, shell=True
-            )
-            
-            # Synchronize with WiFi_Backup directory: remove corresponding XML backup file(s)
-            if BACKUP_DIR.exists():
-                for xml_file in BACKUP_DIR.glob("*.xml"):
-                    # netsh exports profiles as Wi-Fi-{SSID}.xml or {SSID}.xml
-                    stem_name = xml_file.stem
-                    if stem_name.startswith("Wi-Fi-"):
-                        stem_name = stem_name[6:]
-                    if stem_name.strip().lower() == item_text.lower():
-                        try:
-                            xml_file.unlink()
-                        except Exception:
-                            pass
-
-                # Remove from enterprise_credentials.json if exists
-                if CREDENTIALS_FILE.exists():
+        if BACKUP_DIR.exists():
+            for xml_file in BACKUP_DIR.glob("*.xml"):
+                stem_name = xml_file.stem
+                if stem_name.startswith("Wi-Fi-"):
+                    stem_name = stem_name[6:]
+                if stem_name.strip().lower() == item_text.lower():
                     try:
-                        creds = json.loads(CREDENTIALS_FILE.read_text(encoding="utf-8"))
-                        matching_keys = [k for k in creds if k.lower() == item_text.lower()]
-                        if matching_keys:
-                            for k in matching_keys:
-                                del creds[k]
-                            CREDENTIALS_FILE.write_text(
-                                json.dumps(creds, indent=2, ensure_ascii=False),
-                                encoding="utf-8",
-                            )
+                        xml_file.unlink()
                     except Exception:
                         pass
 
-            self.load_profiles()
-        else:
-            messagebox.showerror("Lỗi", f"Không thể xóa profile: {res.stderr}")
+            # Remove from enterprise_credentials.json if exists
+            if CREDENTIALS_FILE.exists():
+                try:
+                    creds = json.loads(CREDENTIALS_FILE.read_text(encoding="utf-8"))
+                    matching_keys = [k for k in creds if k.lower() == item_text.lower()]
+                    if matching_keys:
+                        for k in matching_keys:
+                            del creds[k]
+                        CREDENTIALS_FILE.write_text(
+                            json.dumps(creds, indent=2, ensure_ascii=False),
+                            encoding="utf-8",
+                        )
+                except Exception:
+                    pass
+
+        self.load_profiles()
 
 
 class CompactWifiApp:
