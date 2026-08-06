@@ -90,7 +90,7 @@ class UpdatePromptDialog(ImpeccableDialog):
         app_icon_path=None,
     ):
         super().__init__(parent, "Cập Nhật Phiên Bản Mới", app_icon_path)
-        self.download_url = GITHUB_PAGES_URL
+        self.download_url = download_url or GITHUB_PAGES_URL
 
         # Header
         head = tk.Frame(self, bg=self.BG, padx=18, pady=12)
